@@ -147,15 +147,16 @@ class PacMan3D
     }
 
     /// <summary>
-    /// MY CODE
+    /// The code below creates the main start menu and a second instructions submenu.
+    /// A two-dimensional array for the border (smileyface) and one-dimensional
+    /// arrays for the letters in the PacMan "Logo" are used. Moreover, three 
+    /// methods - one for the game instructions and two for printing the smileyface and 
+    /// PacMan "Logo" arrays are also implemented.
     /// </summary>
-    /// 
+  
     static void StartupScreen()
     {
-        //TO DO: string pacManLogo = "PAC MAN 3D";
-
         //Two-dimensional border array (smileyface)
-        Console.CursorVisible = false;
 
         char[,] smileyFace = new char[Console.BufferHeight, Console.BufferWidth];
 
@@ -173,11 +174,10 @@ class PacMan3D
             smileyFace[row, Console.BufferWidth - 1] = (char)9787;
         }
 
-        //Printing of border array
-        PrintSmileyArray(smileyFace);
+        PrintSmileyArray(smileyFace); //Printing border (smileyface array) and Pac Man "Logo"
+        PrintPacManLogo(); 
 
-/////
-        int cursorPositionX = Console.BufferWidth / 7;
+        int cursorPositionX = Console.BufferWidth / 7; //Set print positions for menu options ("New Game" and "Read Instructions")
         int cursorPositionY = Console.BufferHeight - 5;
         Console.SetCursorPosition(cursorPositionX, cursorPositionY);
 
@@ -185,17 +185,18 @@ class PacMan3D
         Console.WriteLine(">>New Game   Read Instructions");
 
         int pressedKeyValue = 0;
-        bool check = pressedKeyValue != 0 || pressedKeyValue != 1;
 
+        var someKey = Console.ReadKey(true).Key;
 
-
-        if (pressedKeyValue == 0 && Console.ReadKey(true).Key == ConsoleKey.Enter) //The ">>" is initially set at New Game, hence if {ENTER} 
-        {                                                                       //is pressed Game will start
+        if (pressedKeyValue == 0 && someKey == ConsoleKey.Enter) //The ">>" is initially set at New Game, 
+        {                                                        //hence if {ENTER} is pressed game will start.
             Console.Beep();
             return;
         }
         else
         {
+            bool check = pressedKeyValue != 0 || pressedKeyValue != 1;
+
             while (check)
             {
                 var key = Console.ReadKey(true).Key;
@@ -214,47 +215,49 @@ class PacMan3D
 
                 switch (pressedKeyValue)
                 {
-                    case 0:
+                    case 0: //Case 0 moves ">>" to "New Game"
                         Console.Clear();
 
                         PrintSmileyArray(smileyFace);
+
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        PrintPacManLogo();
 
                         Console.SetCursorPosition(cursorPositionX, cursorPositionY);
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(">>New Game    Read Instructions");
                         break;
 
-                    case 1:
+                    case 1: //Case 1 moves ">>" to "Read Instructions"
                         Console.Clear();
 
                         PrintSmileyArray(smileyFace);
+                        
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        PrintPacManLogo();
 
                         Console.SetCursorPosition(cursorPositionX, cursorPositionY);
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("New Game    >>Read Instructions");
                         break;
-
                 }
 
                 if (pressedKeyValue == 0 && key == ConsoleKey.Enter) //">>" will be at "New Game" and after 
-                {                                                                          //pressing {ENTER} game will start.
+                {                                                    //pressing {ENTER} game will start.
                     Console.Beep();
                     break;
                 }
 
                 if (pressedKeyValue == 1 && key == ConsoleKey.Enter) //">>" will be at "Read Instructions" and after
-                {
+                {                                                    //presing {Enter} Instructions submenu will appear.
                     Console.Beep();
                     Console.Clear();                                                       
                     PrintSmileyArray(smileyFace);
                     Instructions();
-                    if (key == ConsoleKey.Escape)
+                    
+                    if (key == ConsoleKey.Escape) //Goes back to main start menu
                     {
-                        StartupScreen();
-                    }
-                    else
-                    {
-                        Instructions();
+                        pressedKeyValue = 0;
                     }
                 }
             }
@@ -272,6 +275,104 @@ class PacMan3D
                 Console.Write(smileyFace[row, col]);
             }
         }
+    }
+
+    static void PrintPacManLogo()
+    {
+        Console.ForegroundColor = ConsoleColor.Gray;
+        string[] P = {"@@@@", 
+                      "@  @",
+                      "@@@@",
+                      "@",
+                      "@"
+                     };
+        string[] A = {" @@", 
+                      "@  @",
+                      "@@@@",
+                      "@  @",
+                      "@  @"
+                     };
+        string[] C = {"@@@@", 
+                      "@",
+                      "@",
+                      "@",
+                      "@@@@"
+                     };
+        string[] M = {"@   @", 
+                      "@@ @@",
+                      "@ @ @",
+                      "@   @",
+                      "@   @"
+                     };
+        string[] N = {"@   @", 
+                      "@@  @",
+                      "@ @ @",
+                      "@  @@",
+                      "@   @"
+                     };
+        string[] three = {"@@@@@", 
+                          "    @",
+                          "@@@@@",
+                          "    @",
+                          "@@@@@"
+                     };
+        string[] D = {"@@@", 
+                      "@   @",
+                      "@   @",
+                      "@   @",
+                      "@@@"
+                     };
+        
+        for (int i = 0; i < P.Length; i++)
+			{
+              Console.SetCursorPosition(4, i + 4);
+			  Console.Write(P[i]);
+			}
+
+        Console.SetCursorPosition(9, 7);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(9, i + 4);
+            Console.Write(A[i]);
+        }
+        Console.SetCursorPosition(14, 7);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(14, i + 4);
+            Console.Write(C[i]);
+        }
+        Console.SetCursorPosition(20, 7);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(20, i + 4);
+            Console.Write(M[i]);
+        }
+        Console.SetCursorPosition(26, 7);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(26, i + 4);
+            Console.Write(A[i]);
+        }
+        Console.SetCursorPosition(31, 7);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(31, i + 4);
+            Console.Write(N[i]);
+        }
+
+        Console.SetCursorPosition(14, 10);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(14, i + 10);
+            Console.Write(three[i]);
+        }
+        Console.SetCursorPosition(20, 10);
+        for (int i = 0; i < P.Length; i++)
+        {
+            Console.SetCursorPosition(20, i + 10);
+            Console.Write(D[i]);
+        }
+
     }
 
     static void Instructions()
