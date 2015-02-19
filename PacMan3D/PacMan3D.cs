@@ -45,34 +45,7 @@ class PacMan3D
 
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
-
-
-        #region Old labyrinth
-        // define labyrinth variable and build example
-        {        //string[] labyrinth = new string[playfieldHeight];
-        //Random rand = new Random();
-        //for (int row = 0; row < playfieldHeight; row++)
-        //{
-        //    for (int col = 0; col < playfieldWidth; col++)
-        //    {
-        //        if (row == playfieldHeight / 2 && col == playfieldWidth / 2)
-        //        {
-        //            labyrinth[row] += " ";
-        //            continue;
-        //        }
-        //        int chance = rand.Next(1, 101);
-        //        if (chance < 20)
-        //        {
-        //            labyrinth[row] += "#";
-        //        }
-        //        else
-        //        {
-        //            labyrinth[row] += " ";
-        //        }
-        //    }
-        //}
-        #endregion
-
+        
         #endregion
 
         while (true)
@@ -205,8 +178,7 @@ class PacMan3D
         //Return the 2D string array with all levels.
         return levels;
     }
-
-
+    
     static string[] selectLevel(string[,] allLevels, int levelNumber)
     {
         //Select the wanted level from the 2D array.
@@ -366,7 +338,7 @@ class PacMan3D
                     Console.Beep();
                     Console.Clear();                                                       
                     PrintSmileyArray(smileyFace);
-                    Instructions();
+                    PrintInstructions();
                     
                     if (key == ConsoleKey.Escape) //Goes back to main start menu
                     {
@@ -488,7 +460,7 @@ class PacMan3D
 
     }
 
-    static void Instructions()
+    static void PrintInstructions()
     {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.SetCursorPosition(Console.BufferWidth / 3, 2);
