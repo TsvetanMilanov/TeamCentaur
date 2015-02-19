@@ -10,9 +10,19 @@ C:\Users\spacegeek\Desktop\EXAMS\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.pd
 C:\Users\spacegeek\Desktop\EXAMS\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe
 C:\Users\spacegeek\Desktop\EXAMS\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
 C:\Users\spacegeek\Desktop\EXAMS\TeamCentaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
+<<<<<<< HEAD
 C:\Users\Пс\Desktop\centaur\PacMan3D\bin\Debug\04.HelloWorld.exe.config
 C:\Users\Пс\Desktop\centaur\PacMan3D\obj\Debug\04.HelloWorld.exe
 C:\Users\Пс\Desktop\centaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
 C:\Users\Пс\Desktop\centaur\PacMan3D\bin\Debug\04.HelloWorld.exe
 C:\Users\Пс\Desktop\centaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
 C:\Users\Пс\Desktop\centaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
+=======
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe.config
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.exe
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\Levels.txt
+>>>>>>> 5cde1925e4edb847a0e075916f913a55062e6c43
