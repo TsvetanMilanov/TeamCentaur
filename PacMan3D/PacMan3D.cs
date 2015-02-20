@@ -36,6 +36,7 @@ class PacMan3D
 
     //Enemy Even move counter
     public static long enemyEvenMoveCounter = 1;
+    public static Random rand = new Random();
 
     static void Main()
     {
@@ -169,58 +170,38 @@ class PacMan3D
 
     private static void MoveEnemy1()
     {
-        /*Move enemy
-            1-right
-            2-left
-            3-up
-            4-down
-
-            */
-        var lastDirection = enemy.lastDirection;
-
-
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == '#'))
+        
+        int randomNum = rand.Next(0, 100);
+        if (randomNum < 25 )
         {
-            enemy.direction = "down";
-            enemy.lastDirection = "right";
+            if (labyrinth[enemy.y][enemy.x - 1] != '#')
+            {
+                enemy.x = enemy.x - 1;
+            }
+            
         }
-
-        if (enemy.direction == "down" && (labyrinth[enemy.y + 1][enemy.x] == '#'))
+        if (randomNum >= 25 && randomNum <= 50)
         {
-            enemy.direction = "left";
-            enemy.lastDirection = "down";
+            if (labyrinth[enemy.y][enemy.x + 1] != '#')
+            {
+                enemy.x = enemy.x + 1;
+            }
+            
+        } 
+        if (randomNum > 50 && randomNum <= 75)
+        {
+            if (labyrinth[enemy.y + 1][enemy.x ] != '#')
+            {
+                enemy.y = enemy.y + 1;
+            }
         }
-
-        if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '#'))
+        if (randomNum > 75 && randomNum <= 100)
         {
-            enemy.direction = "up";
-            enemy.lastDirection = "left";
-        }
-
-        if (enemy.direction == "up" && labyrinth[enemy.y - 1][enemy.x] == '#')
-        {
-            enemy.direction = "right";
-            enemy.lastDirection = "up";
-        }
-
-
-
-
-        if (enemy.direction == "right")
-        {
-            enemy.x += 1;
-        }
-        if (enemy.direction == "down")
-        {
-            enemy.y += 1;
-        }
-        if (enemy.direction == "left")
-        {
-            enemy.x -= 1;
-        }
-        if (enemy.direction == "up")
-        {
-            enemy.y -= 1;
+            if (labyrinth[enemy.y - 1][enemy.x] != '#')
+            {
+                enemy.y = enemy.y - 1;
+            }
+           
         }
     }
 
