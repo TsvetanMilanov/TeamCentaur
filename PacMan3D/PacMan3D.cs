@@ -39,7 +39,7 @@ class PacMan3D
     //Enemy Even move counter
     public static long enemyEvenMoveCounter = 1;
 
-    // level counter
+    //level counter
     public static int levelNumber = 0;
     
     static void Main()
@@ -158,7 +158,7 @@ class PacMan3D
         
      
 
-        levelNumber = 0; //The number of the level which will be printed.
+        levelNumber = 0; //The number of the level which will be printed.  (global)
         int levelsCount = 4; //The count of all the levels in Levels.txt file.
         //2D string array which will contain all the levels.
         string[,] allLevels = new string[levelsCount, playfieldWidth];
