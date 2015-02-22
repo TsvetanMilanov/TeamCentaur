@@ -57,7 +57,7 @@ class PacMan3D
 
 
 
-        
+
         //Enemy stats 
         //Randomizing enmies positions COPY>>>>
         Random randomizerEnemy = new Random();
@@ -202,7 +202,9 @@ class PacMan3D
 
             PrintFrame();
             enemyEvenMoveCounter++;
+
             Thread.Sleep(100);  // control game speed
+
         }
 
 
@@ -228,7 +230,7 @@ class PacMan3D
         PrintElement(enemy3);
         PrintElement(enemy4);
 
-        PrintMenu(); // addded by darkyto (prints the in-game active menu)
+        PrintMenu(); // level (have global - hardcored value), lives (needed) , score counters (needed)
     }
 
     static void PrintMenu() // this will print the in-game menu with results,lifes,levels, ect..  darkyto comments
@@ -236,7 +238,13 @@ class PacMan3D
         //int cursorPosX = 0; // the in-game menu starts at x=0 and y=20
         //int cursorPosY = 20;// just for info of starting coordinates - remove later
         int menuWidth = 19; // in-game menu width and height
-        int menuHeight = 19;
+        // int menuHeight = 19;
+
+        string[] textLines = {                     // array for all in-game menu frames
+                              "╔════════════╗",
+                              "              ",
+                              "╚════════════╝"
+                              };
 
         #region Draw borders
         // top line border print
@@ -250,147 +258,7 @@ class PacMan3D
         Console.WriteLine(new string('\u2588', menuWidth));
         Console.ForegroundColor = ConsoleColor.Black;
 
-        //startprint vertical line borders (left and righ)   - THE BORDERS HAD SOME NASTY FLICKER EFECT.. Check this out in next meeting
-        Console.SetCursorPosition(21, 0);
-        for (int rows = 0; rows < menuWidth; rows++)
-        {
-            for (int cols = 0; cols < menuHeight - 18; cols++) // hardcored to minimaze loops (and flickerness)
-            {
-                if (cols == 0 && rows > 0)
-                {
-                    Console.SetCursorPosition(20, rows);
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write("\u2588");
-                    Console.ForegroundColor = ConsoleColor.Black;
-                }
-            }
-            Console.WriteLine();
-        }
-        for (int rows = 0; rows < menuWidth; rows++)
-        {
-            for (int cols = 17; cols < menuHeight; cols++) // hardcored to minimaze loops
-            {
-                if (cols == 18 && rows > 0)
-                {
-                    Console.SetCursorPosition(38, rows);
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write("\u2588");
-                    Console.ResetColor();
-                }
-            }
-            Console.WriteLine();
-        }
-        // end print vertical line borders (left and righ)
-        #endregion
-
-        Console.SetCursorPosition(23, 0);
-        Console.BackgroundColor = ConsoleColor.DarkCyan;
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.WriteLine("Team  Centaur");
-        Console.ResetColor();
-
-        // Lifecounter
-        #region LifeCounter
-        
-        int lifesCounter = 4; // hardcored for now - take the global for lifes remaingin after it is ready
-        Console.SetCursorPosition(22, 2);
-        switch (lifesCounter)
-        {
-            case 1: 
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╔═════════╗");
-                    Console.SetCursorPosition(22, 3);
-                    Console.Write(" Lifes : ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 1)); // insert global lifes counter here - also make it if-else 
-                    Console.SetCursorPosition(22, 4);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╚═════════╝");
-                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
-                }
-                break;
-            case 2:
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╔══════════╗");
-                    Console.SetCursorPosition(22, 3);
-                    Console.Write(" Lifes : ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 2)); // insert global lifes counter here - also make it if-else 
-                    Console.Write("   ");
-                    Console.SetCursorPosition(22, 4);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╚══════════╝");
-                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
-                }
-                break;
-            case 3:
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╔═══════════╗");
-                    Console.SetCursorPosition(22, 3);
-                    Console.Write(" Lifes : ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787,3)); // insert global lifes counter here - also make it if-else 
-                    Console.Write("  ");
-                    Console.SetCursorPosition(22, 4);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╚════════════╝");
-                    Console.WriteLine();
-                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
-                }
-                break;
-            case 4:
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╔════════════╗");
-                    Console.SetCursorPosition(22, 3);
-                    Console.Write(" Lifes : ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 4)); // insert global lifes counter here - also make it if-else 
-                    Console.Write(" ");
-                    Console.SetCursorPosition(22, 4);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╚════════════╝");
-                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
-                }
-                break;
-            case 5:
-                {
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╔═════════════╗");
-                    Console.SetCursorPosition(22, 3);
-                    Console.Write(" Lifes : ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 5)); // insert global lifes counter here - also make it if-else 
-                    Console.Write(" ");
-                    Console.SetCursorPosition(22, 4);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("╚═════════════╝");
-                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
-                }
-                break;
-                default: break;
-        }
-        #endregion // Lifecounter
-
-        Console.SetCursorPosition(22, 5);
-        Console.BackgroundColor = ConsoleColor.DarkYellow;
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine("╔════════════╗");
-        Console.SetCursorPosition(22, 6);
-        Console.WriteLine(" SCORE: {0,5} ", 230); // insert global score counter here (temp test hardcored value)
-        Console.SetCursorPosition(22, 7);
-        Console.WriteLine("╚════════════╝");
-        Console.ResetColor();
-
-        string[] gradientDivider = {"                  ",
+        string[] gradientDivider = {"                 ",
                                     "█▓▒░░._____.░░▒▓█"
                                    };
 
@@ -402,10 +270,300 @@ class PacMan3D
             Console.Write(gradientDivider[i]);
             Console.ResetColor();
         }
+        #endregion
+
+        #region teamNameTitle
+        Console.SetCursorPosition(24, 0);
+        Console.BackgroundColor = ConsoleColor.DarkCyan;
+        Console.ForegroundColor = ConsoleColor.Gray;
+        // Console.WriteLine("¸¸.•*¨*•♫♪");  // check this music for a game sound
+        Console.WriteLine("Team Centaur");
+        Console.SetCursorPosition(22, 0);
+        Console.WriteLine("◄");  //◄ ◄  ► ►     ← ← → →   ↑ ↑ ↓ ↓
+        Console.SetCursorPosition(36, 0);
+        Console.WriteLine(" ►");  //◄ ◄  ► ►     
+        Console.ResetColor();
+        #endregion
+
+        //start regions: Lifecounter(global variable NEEDED)  + ScoreCounter(global variable NEEDED) + LevelCounter (global variable USED hardcore)
+        #region LifeCounter
+
+        int lifesCounter = 4; // hardcored for now - take the global for lifes remaining after it is ready
+        string lifeText = " Lifes ► ";
+        Console.SetCursorPosition(23, 2);
+        switch (lifesCounter)
+        {
+            case 1:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 2);
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 3);
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(lifeText);
+                    Console.Write(new string((char)9787, 1));
+                    Console.ResetColor();
+                }
+                break;
+
+            case 2:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 2);
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 3);
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(lifeText);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 2));
+                    Console.ResetColor();
+                }
+                break;
+            case 3:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 2);
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 3);
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(lifeText);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 3));
+                    Console.ResetColor();
+                }
+                break;
+            case 4:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 2);
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 3);
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(lifeText);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 4));
+                    Console.ResetColor();
+                }
+                break;
+            case 5: 
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 2);
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 3);
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(lifeText);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 5));
+                    Console.ResetColor();
+                }
+                break;
+            default: break;
+        }
+        #endregion // Lifecounter
+
+        #region ScoreCounter
+        for (int i = 0; i < textLines.Length; i++)
+        {
+            Console.SetCursorPosition(23, i + 5);
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(textLines[i]);
+            Console.ResetColor();
+        }
+        Console.SetCursorPosition(23, 6);
+        Console.BackgroundColor = ConsoleColor.DarkYellow;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(" SCORE ►{0,5} ", 230); // score hardcored for now - change later to active score variable
+        Console.ResetColor();
+        #endregion
+
+        #region LevelCounter
+
+        levelNumber = 1; // hardcored for now - take the global for lifes remaining after it is ready
+        string textLevel = " LEVEL ";
+
+        Console.SetCursorPosition(23, 8);
+        switch (levelNumber)
+        {
+            case 1:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 8);
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 9);
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
+                    Console.ResetColor();
+                }
+                break;
+            case 2:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 8);
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 9);
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
+                    Console.ResetColor();
+                }
+                break;
+            case 3:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 8);
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 9);
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
+                    Console.ResetColor();
+                }
+                break;
+            case 4:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 8);
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 9);
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
+                    Console.ResetColor();
+                }
+                break;
+            case 5:
+                {
+                    for (int i = 0; i < textLines.Length; i++)
+                    {
+                        Console.SetCursorPosition(23, i + 8);
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(textLines[i]);
+                        Console.ResetColor();
+                    }
+                    Console.SetCursorPosition(23, 9);
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
+                    Console.ResetColor();
+                }
+                break;
+            default: break;
+        }
+        #endregion
+        //end regions: Lifecounter + ScoreCounter+ LevelCounter
+
+//        string[] pacmanEnemy = {
+//                               @"
+//                                ──▒▒▒▒▒──
+//                                ─▒─▄▒─▄▒─
+//                                ─▒▒▒▒▒▒▒─
+//                                ─▒▒▒▒▒▒▒─
+//                                ─▒─▒─▒─▒─" 
+//                               };
+//        for (int i = 0; i < pacmanEnemy.Length; i++)
+//        {
+//            Console.SetCursorPosition(20, i + 5);
+//            Console.BackgroundColor = ConsoleColor.DarkRed;
+//            Console.ForegroundColor = ConsoleColor.White;
+//            Console.Write(pacmanEnemy[i]);
+//            Console.ResetColor();
+//        }
+
+        // exit(game over) screen?
+        string[] centaurPic ={
+                      @" |__
+   --==/////////////[})))==*
+                     |\ '          ,|
+                       `\`\      //|'                           ,|
+                         \ `\  //,/'                          -~ |
+         )           _-~~~\  |/ / |'                       _-~  /  ,
+        )(          /'  )  | \ / /'                     _-~   _/_-~|
+       (( )         ;  /`  ' )/ /''                 _ -~     _-~ ,/'
+       ) )(         `~~\   `\\/'/|'           __--~~__--\ _-~  _/,
+      ((___)          / ~~    \ /~      __--~~  --~~  __/~  _-~ /
+        | |          |    )   | '      /        __--~~  \-~~ _-~
+         \(\    __--(   _/    |'\     /     --~~   __--~' _-~ ~|
+         (  ((~~   __-~        \~\   /     ___---~~  ~~\~~__--~
+         `~~\~~~~~~   `\-~      \~\ /           __--~~~'~~/
+                       ;\ __--~  ~-/      ~~~~~__\__---~~.,,,
+                       ;;;;;;;;'  /      ---~~~/__-----_;;;;;;;;,,
+                      ;;;;;;;'   /      ----~~/          \ `;;;;;;;;;;;;,
+                      ;;;;'     (      ---~~/         `:::|  `;;;;;;;;;;;;;;.
+                      |'  _      `----~~~~'      /      `:|    ;;;;;;;'  `;;'
+                ______/\/~    |                 /        /       `;;;;;   `;
+              /~;;.____/;;'  /          ___----(   `;;;/          ;;;
+             / //  _;______;'------~~~~~    |;;/\    /           ;;
+            //  \ \                        / ,|  \;;,\            `
+           (<_    \ \                    /',/-----'  _>
+            \_|     \\_                 //~;~~~~~~~~~
+                     \_|               (,~~   -Tua Xiong
+                                        \~\
+                                         ~~"         
+                                     };
+        //for (int i = 0; i < centaurPic.Length; i++)               
+        //{
+        //    Console.SetCursorPosition(1, i + 1);
+        //    Console.BackgroundColor = ConsoleColor.DarkRed;
+        //    Console.ForegroundColor = ConsoleColor.White;
+        //    Console.Write(centaurPic[i]);
+        //    Console.ResetColor();
+        //}
 
     }
-
-
 
     private static void MovePacMan()
     {
