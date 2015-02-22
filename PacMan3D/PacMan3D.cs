@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.IO;
 
+
 struct Element
 {
     //adding comment
@@ -41,7 +42,7 @@ class PacMan3D
 
     //level counter
     public static int levelNumber = 0;
-    
+
     static void Main()
     {
         //Method for creating playing field
@@ -53,6 +54,8 @@ class PacMan3D
         pacMan.y = playfieldHeight / 2;
         pacMan.skin = (char)9787; // utf8 decimal code 9787 (smile face) is our hero character
         pacMan.colour = ConsoleColor.Yellow;
+
+
 
         
         //Enemy stats 
@@ -81,7 +84,7 @@ class PacMan3D
         {
             enemy.direction = "down";
         }
-        
+
 
         positionEnemyX = randomizerEnemy.Next(1, 5);
         positionEnemyY = randomizerEnemy.Next(1, 5);
@@ -155,8 +158,8 @@ class PacMan3D
             enemy4.direction = "down";
         }
         //COPY>>>>>>
-        
-     
+
+
 
         levelNumber = 0; //The number of the level which will be printed.  (global)
         int levelsCount = 4; //The count of all the levels in Levels.txt file.
@@ -201,8 +204,10 @@ class PacMan3D
             enemyEvenMoveCounter++;
             Thread.Sleep(100);  // control game speed
         }
+
+
     }
-        
+
     private static void CheckForImpact()
     {
         //Check for impact
@@ -222,15 +227,191 @@ class PacMan3D
         PrintElement(enemy2);
         PrintElement(enemy3);
         PrintElement(enemy4);
+
+        PrintMenu(); // addded by darkyto (prints the in-game active menu)
+    }
+
+    static void PrintMenu() // this will print the in-game menu with results,lifes,levels, ect..  darkyto comments
+    {
+        //int cursorPosX = 0; // the in-game menu starts at x=0 and y=20
+        //int cursorPosY = 20;// just for info of starting coordinates - remove later
+        int menuWidth = 19; // in-game menu width and height
+        int menuHeight = 19;
+
+        #region Draw borders
+        // top line border print
+        Console.SetCursorPosition(20, 0);
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine(new string('\u2588', menuWidth)); // using menuWidth as size
+
+        //bottom line border print
+        Console.SetCursorPosition(20, 19);
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine(new string('\u2588', menuWidth));
+        Console.ForegroundColor = ConsoleColor.Black;
+
+        //startprint vertical line borders (left and righ)   - THE BORDERS HAD SOME NASTY FLICKER EFECT.. Check this out in next meeting
+        Console.SetCursorPosition(21, 0);
+        for (int rows = 0; rows < menuWidth; rows++)
+        {
+            for (int cols = 0; cols < menuHeight - 18; cols++) // hardcored to minimaze loops (and flickerness)
+            {
+                if (cols == 0 && rows > 0)
+                {
+                    Console.SetCursorPosition(20, rows);
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write("\u2588");
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+            }
+            Console.WriteLine();
+        }
+        for (int rows = 0; rows < menuWidth; rows++)
+        {
+            for (int cols = 17; cols < menuHeight; cols++) // hardcored to minimaze loops
+            {
+                if (cols == 18 && rows > 0)
+                {
+                    Console.SetCursorPosition(38, rows);
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write("\u2588");
+                    Console.ResetColor();
+                }
+            }
+            Console.WriteLine();
+        }
+        // end print vertical line borders (left and righ)
+        #endregion
+
+        Console.SetCursorPosition(23, 0);
+        Console.BackgroundColor = ConsoleColor.DarkCyan;
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.WriteLine("Team  Centaur");
+        Console.ResetColor();
+
+        // Lifecounter
+        #region LifeCounter
+        
+        int lifesCounter = 4; // hardcored for now - take the global for lifes remaingin after it is ready
+        Console.SetCursorPosition(22, 2);
+        switch (lifesCounter)
+        {
+            case 1: 
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╔═════════╗");
+                    Console.SetCursorPosition(22, 3);
+                    Console.Write(" Lifes : ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 1)); // insert global lifes counter here - also make it if-else 
+                    Console.SetCursorPosition(22, 4);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╚═════════╝");
+                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
+                }
+                break;
+            case 2:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╔══════════╗");
+                    Console.SetCursorPosition(22, 3);
+                    Console.Write(" Lifes : ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 2)); // insert global lifes counter here - also make it if-else 
+                    Console.Write("   ");
+                    Console.SetCursorPosition(22, 4);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╚══════════╝");
+                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
+                }
+                break;
+            case 3:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╔═══════════╗");
+                    Console.SetCursorPosition(22, 3);
+                    Console.Write(" Lifes : ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787,3)); // insert global lifes counter here - also make it if-else 
+                    Console.Write("  ");
+                    Console.SetCursorPosition(22, 4);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╚════════════╝");
+                    Console.WriteLine();
+                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
+                }
+                break;
+            case 4:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╔════════════╗");
+                    Console.SetCursorPosition(22, 3);
+                    Console.Write(" Lifes : ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 4)); // insert global lifes counter here - also make it if-else 
+                    Console.Write(" ");
+                    Console.SetCursorPosition(22, 4);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╚════════════╝");
+                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
+                }
+                break;
+            case 5:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╔═════════════╗");
+                    Console.SetCursorPosition(22, 3);
+                    Console.Write(" Lifes : ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(new string((char)9787, 5)); // insert global lifes counter here - also make it if-else 
+                    Console.Write(" ");
+                    Console.SetCursorPosition(22, 4);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("╚═════════════╝");
+                    Console.ResetColor();               // if life are full = defautlt color green.. two lifes - color=yellow .. one life color=red
+                }
+                break;
+                default: break;
+        }
+        #endregion // Lifecounter
+
+        Console.SetCursorPosition(22, 5);
+        Console.BackgroundColor = ConsoleColor.DarkYellow;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine("╔════════════╗");
+        Console.SetCursorPosition(22, 6);
+        Console.WriteLine(" SCORE: {0,5} ", 230); // insert global score counter here (temp test hardcored value)
+        Console.SetCursorPosition(22, 7);
+        Console.WriteLine("╚════════════╝");
+        Console.ResetColor();
+
+        string[] gradientDivider = {"                  ",
+                                    "█▓▒░░._____.░░▒▓█"
+                                   };
+
+        for (int i = 0; i < gradientDivider.Length; i++)
+        {
+            Console.SetCursorPosition(21, i + 18);
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(gradientDivider[i]);
+            Console.ResetColor();
+        }
+
     }
 
 
-   
+
     private static void MovePacMan()
     {
         while (Console.KeyAvailable)
         {
-            
+
             // we assign the pressed key value to a variable pressedKey
             ConsoleKeyInfo pressedKey = Console.ReadKey(true);
             // next we start checking the value of the pressed key and take action if neccessary
@@ -279,7 +460,7 @@ class PacMan3D
             4-down
 
             */
-       
+
 
         var lastDirection = enemy.lastDirection;
         //if enemy moves right START here COPY>>>>>
@@ -410,7 +591,7 @@ class PacMan3D
                 enemy.direction = "down";
             }
             enemy.lastDirection = "down";
-        }		
+        }
         //if enemy moves down END here
         //if enemy moves left START here
         if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588'))
@@ -424,7 +605,7 @@ class PacMan3D
             enemy.direction = "down";
             enemy.lastDirection = "left";
         }
-         
+
         if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588'))
         {
             enemy.direction = "right";
@@ -700,7 +881,7 @@ class PacMan3D
                 enemy2.direction = "down";
             }
             enemy2.lastDirection = "down";
-        }		
+        }
         //if enemy2 moves down END here
         //if enemy2 moves left START here
         if (enemy2.direction == "left" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588'))
@@ -993,7 +1174,7 @@ class PacMan3D
                 enemy3.direction = "down";
             }
             enemy3.lastDirection = "down";
-        }		
+        }
         //if enemy3 moves down END here
         //if enemy3 moves left START here
         if (enemy3.direction == "left" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588'))
@@ -1284,7 +1465,7 @@ class PacMan3D
                 enemy4.direction = "down";
             }
             enemy4.lastDirection = "down";
-        }		
+        }
         //if enemy4 moves down END here
         //if enemy4 moves left START here
         if (enemy4.direction == "left" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588'))
@@ -1494,7 +1675,7 @@ class PacMan3D
         }
 
         int count = listOfLevels.Count;
-        
+
 
         //String array for all the levels.
         string[,] levels = new string[count, playfieldWidth];
@@ -1504,7 +1685,7 @@ class PacMan3D
         {
             for (int k = 0; k < playfieldWidth; k++)
             {
-                
+
                 levels[j, k] = listOfLevels[j][k];
             }
         }
@@ -1512,7 +1693,7 @@ class PacMan3D
         //Return the 2D string array with all levels.
         return levels;
     }
-    
+
     static string[] selectLevel(string[,] allLevels, int levelNumber)
     {
         //Select the wanted level from the 2D array.
@@ -1565,6 +1746,7 @@ class PacMan3D
         }
     }
 
+
     static void StartupScreen()
     {
         //Two-dimensional border array (smileyface)
@@ -1586,7 +1768,7 @@ class PacMan3D
         }
 
         PrintSmileyArray(smileyFace); //Printing border (smileyface array) and Pac Man "Logo"
-        PrintPacManLogo(); 
+        PrintPacManLogo();
 
         int cursorPositionX = Console.BufferWidth / 7; //Set print positions for menu options ("New Game" and "Read Instructions")
         int cursorPositionY = Console.BufferHeight - 5;
@@ -1643,7 +1825,7 @@ class PacMan3D
                         Console.Clear();
 
                         PrintSmileyArray(smileyFace);
-                        
+
                         Console.ForegroundColor = ConsoleColor.Gray;
                         PrintPacManLogo();
 
@@ -1662,10 +1844,10 @@ class PacMan3D
                 if (pressedKeyValue == 1 && key == ConsoleKey.Enter) //">>" will be at "Read Instructions" and after
                 {                                                    //presing {Enter} Instructions submenu will appear.
                     Console.Beep();
-                    Console.Clear();                                                       
+                    Console.Clear();
                     PrintSmileyArray(smileyFace);
                     PrintInstructions();
-                    
+
                     if (key == ConsoleKey.Escape) //Goes back to main start menu
                     {
                         pressedKeyValue = 0;
@@ -1673,7 +1855,7 @@ class PacMan3D
                 }
             }
         }
-        
+
     }
 
     static void PrintSmileyArray(char[,] smileyFace)
@@ -1733,12 +1915,12 @@ class PacMan3D
                       "\u2588   \u2588",
                       "\u2588\u2588\u2588"
                      };
-        
+
         for (int i = 0; i < P.Length; i++)
-			{
-              Console.SetCursorPosition(4, i + 4);
-			  Console.Write(P[i]);
-			}
+        {
+            Console.SetCursorPosition(4, i + 4);
+            Console.Write(P[i]);
+        }
 
         Console.SetCursorPosition(9, 7);
         for (int i = 0; i < P.Length; i++)
@@ -1798,7 +1980,7 @@ class PacMan3D
         Console.SetCursorPosition(1, 6);
         Console.WriteLine("pieces and earning points. Once the");
         Console.SetCursorPosition(1, 7);
-        Console.WriteLine("player has collected a certain amount"); 
+        Console.WriteLine("player has collected a certain amount");
         Console.SetCursorPosition(1, 8);
         Console.WriteLine("of points, a secret portal opens to");
         Console.SetCursorPosition(1, 9);
