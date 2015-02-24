@@ -4,3 +4,4 @@ D:\TELERIK\teamProject\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe
 D:\TELERIK\teamProject\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
 D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.exe
 D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
+D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
