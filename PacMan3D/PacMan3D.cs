@@ -4,219 +4,133 @@ using System.Text;
 using System.Threading;
 using System.IO;
 
-
-struct Element
+struct Creature
 {
-    //adding comment
-    // define new object type with structure
-    // screen position x,y
-    public int x;
-    public int y;
-    // type of game object is defined by ASCII char
-    public char skin;
+    public int y;   // horizontal position
+    public int x;   // vertical position
+    public char skin; // type of game object is defined by ASCII char
     public ConsoleColor colour;
+    // AI variables
     public string direction;
     public string lastDirection;
 
+    // constructor
+    public Creature(int x=0, int y=0, char skin='?', ConsoleColor colour = ConsoleColor.Gray)
+    {
+        this.x = x;
+        this.y = y;
+        this.skin = skin;
+        this.colour = colour;
+        this.direction = "left";
+        this.lastDirection = "right";
+    }
 }
 
-class PacMan3D
+class PacMan3DGame
 {
-    //Global variables
-    public static Element enemy = new Element();
-    public static Element enemy2 = new Element();
-    public static Element enemy3 = new Element();
-    public static Element enemy4 = new Element();
+    // Global variables
+    private const int playfieldHeight = 20;
+    private const int playfieldWidth = 20;
 
-    public static Element pacMan = new Element();
-    public static string[] labyrinth;
+    private static Creature pacMan = new Creature(playfieldHeight / 2, playfieldWidth / 2, (char)9787, ConsoleColor.Yellow);
 
-    public static int playfieldHeight;
-    public static int playfieldWidth;
+    private static int enemiesCount = 4;
 
-    //Check if the game is over variable
-    public static bool isGameOver = false;
+    private static Creature[] enemies = new Creature[enemiesCount];
 
-    //Enemy Even move counter
-    public static long enemyEvenMoveCounter = 1;
+    private static string[] labyrinth;
 
-    //level counter
-    public static int levelNumber = 0;
+    // Check if the game is over variable
+    private static bool isGameOver = false;
 
+    // Enemy Even move counter
+    private static long enemyEvenMoveCounter = 1;
+    private static Random randomizer = new Random();    
+    
     static void Main()
     {
-        //Method for creating playing field
-        SetPlayfieldSize(out playfieldHeight, out playfieldWidth);
+        // set console size (screen resolution)
+        Console.BufferHeight = Console.WindowHeight = 21;
+        Console.BufferWidth = Console.WindowWidth = 40;
 
-        StartupScreen();
-        // initial pacman position in center of playfield
-        pacMan.x = (playfieldWidth + 1) / 2 + 1;
-        pacMan.y = playfieldHeight / 2;
-        pacMan.skin = (char)9787; // utf8 decimal code 9787 (smile face) is our hero character
-        pacMan.colour = ConsoleColor.Yellow;
-
-
-
-
-        //Enemy stats 
-        //Randomizing enmies positions COPY>>>>
-        Random randomizerEnemy = new Random();
-        int positionEnemyX = randomizerEnemy.Next(1, 5);
-        int positionEnemyY = randomizerEnemy.Next(1, 5);
-        enemy.x = (playfieldHeight - 3) / positionEnemyX;
-        enemy.y = (playfieldWidth - 3) / positionEnemyY;
-        enemy.skin = '\u2666'; // utf8 decimal code 2666 (black diamond) is our enemy character COPY>>>>>
-        enemy.colour = ConsoleColor.Red;
-        int enemyStartDirection = randomizerEnemy.Next(1, 5); // randomizining enemy start direction
-        if (enemyStartDirection == 1)
-        {
-            enemy.direction = "right";
-        }
-        else if (enemyStartDirection == 2)
-        {
-            enemy.direction = "left";
-        }
-        else if (enemyStartDirection == 3)
-        {
-            enemy.direction = "up";
-        }
-        else if (enemyStartDirection == 4)
-        {
-            enemy.direction = "down";
-        }
-
-
-        positionEnemyX = randomizerEnemy.Next(1, 5);
-        positionEnemyY = randomizerEnemy.Next(1, 5);
-        enemy2.x = (playfieldHeight - 3) / positionEnemyX; ;
-        enemy2.y = (playfieldWidth - 3) / positionEnemyY;
-        enemy2.skin = '\u2666'; // utf8 decimal code 2666 (black diamond) is our enemy character COPY>>>>>>
-        enemy2.colour = ConsoleColor.Green;
-        int enemy2StartDirection = randomizerEnemy.Next(1, 5); // randomizining enemy start direction
-        if (enemy2StartDirection == 1)
-        {
-            enemy2.direction = "right";
-        }
-        else if (enemy2StartDirection == 2)
-        {
-            enemy2.direction = "left";
-        }
-        else if (enemy2StartDirection == 3)
-        {
-            enemy2.direction = "up";
-        }
-        else if (enemy2StartDirection == 4)
-        {
-            enemy2.direction = "down";
-        }
-
-        positionEnemyX = randomizerEnemy.Next(1, 5);
-        positionEnemyY = randomizerEnemy.Next(1, 5);
-        enemy3.x = (playfieldHeight - 3) / positionEnemyX; ;
-        enemy3.y = (playfieldWidth - 3) / positionEnemyY;
-        enemy3.skin = '\u2666'; // utf8 decimal code 2666 (black diamond) is our enemy character COPY>>>>>>
-        enemy3.colour = ConsoleColor.Cyan;
-        int enemy3StartDirection = randomizerEnemy.Next(1, 5); // randomizining enemy start direction
-        if (enemy3StartDirection == 1)
-        {
-            enemy3.direction = "right";
-        }
-        else if (enemy3StartDirection == 2)
-        {
-            enemy3.direction = "left";
-        }
-        else if (enemy3StartDirection == 3)
-        {
-            enemy3.direction = "up";
-        }
-        else if (enemy3StartDirection == 4)
-        {
-            enemy3.direction = "down";
-        }
-
-        positionEnemyX = randomizerEnemy.Next(1, 5);
-        positionEnemyY = randomizerEnemy.Next(1, 5);
-        enemy4.x = (playfieldHeight - 3) / positionEnemyX; ;
-        enemy4.y = (playfieldWidth - 3) / positionEnemyY;
-        enemy4.skin = '\u2666'; // utf8 decimal code 2666 (black diamond) is our enemy character COPY>>>>>>
-        enemy4.colour = ConsoleColor.Magenta;
-        int enemy4StartDirection = randomizerEnemy.Next(1, 5); // randomizining enemy start direction
-        if (enemy4StartDirection == 1)
-        {
-            enemy4.direction = "right";
-        }
-        else if (enemy4StartDirection == 2)
-        {
-            enemy4.direction = "left";
-        }
-        else if (enemy4StartDirection == 3)
-        {
-            enemy4.direction = "up";
-        }
-        else if (enemy4StartDirection == 4)
-        {
-            enemy4.direction = "down";
-        }
-        //COPY>>>>>>
-
-
-
-        levelNumber = 0; //The number of the level which will be printed.  (global)
+        // labyrinth initializer
+        int levelNumber = 0; //The number of the level which will be printed.
         int levelsCount = 4; //The count of all the levels in Levels.txt file.
         //2D string array which will contain all the levels.
         string[,] allLevels = new string[levelsCount, playfieldWidth];
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
+        labyrinth = selectLevel(allLevels, levelNumber);
+
+        // enemy initializer
+        for (int i = 0; i < enemiesCount; i++)
+        {
+            int x = (playfieldHeight - 3) / randomizer.Next(1, 5);
+            int y = (playfieldWidth - 3) / randomizer.Next(1, 5);
+            enemies[i] = new Creature(x, y, '\u2666', ConsoleColor.Red);
+
+            int enemyStartDirection = randomizer.Next(1, 5); // randomizining enemy start direction
+            if (enemyStartDirection == 1)
+            {
+                enemies[i].direction = "right";
+            }
+            else if (enemyStartDirection == 2)
+            {
+                enemies[i].direction = "left";
+            }
+            else if (enemyStartDirection == 3)
+            {
+                enemies[i].direction = "up";
+            }
+            else if (enemyStartDirection == 4)
+            {
+                enemies[i].direction = "down";
+            }
+        }
+
+        StartupScreen();
 
         // Main game logic
         while (true)
         {
             //The array labyrinth is equal to the current level we select.
-            labyrinth = selectLevel(allLevels, levelNumber);
+            //labyrinth = selectLevel(allLevels, levelNumber);
 
             // Move the enemy per 2 steps
             if (enemyEvenMoveCounter % 2 == 0)
-            {
-                MoveEnemy1();
-                MoveEnemy2();
-                MoveEnemy3();
-                MoveEnemy4();
+            {                
+                MoveEnemies(enemies);
             }
 
-            // pacman every step
+            // detect pacman movement every frame redraw
             MovePacMan();
 
             //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
             CheckForImpact();
 
-
             //CheckForImpact gives true or false on isGameOver
             if (isGameOver)
             {
-
                 Console.Clear();
                 Console.WriteLine("Game Over");
-                // remove some lives points etc.
                 break;
             }
 
             PrintFrame();
             enemyEvenMoveCounter++;
-
             Thread.Sleep(100);  // control game speed
-
         }
-
-
     }
-
+        
     private static void CheckForImpact()
     {
-        //Check for impact
-        if ((enemy.x == pacMan.x && enemy.y == pacMan.y) || (enemy2.x == pacMan.x && enemy2.y == pacMan.y) || (enemy3.x == pacMan.x && enemy3.y == pacMan.y) || (enemy4.x == pacMan.x && enemy4.y == pacMan.y))
+        for (int i = 0; i < enemiesCount; i++)
         {
-            Console.WriteLine("Game Over !");
-            isGameOver = true;
+            if (enemies[i].y == pacMan.y && enemies[i].x == pacMan.x)
+            {
+                Console.WriteLine("Game Over !");
+                isGameOver = true;
+            }
         }
     }
 
@@ -225,1564 +139,343 @@ class PacMan3D
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
         PrintElement(pacMan);
-        PrintElement(enemy);
-        PrintElement(enemy2);
-        PrintElement(enemy3);
-        PrintElement(enemy4);
-
-        PrintMenu(); // level (have global - hardcored value), lives (needed) , score counters (needed)
+        // print all enemies
+        for (int i = 0; i < enemiesCount; i++)
+        {
+            PrintElement(enemies[i]);            
+        }
     }
-
-    static void PrintMenu() // this will print the in-game menu with results,lifes,levels, ect..  darkyto comments
-    {
-        //int cursorPosX = 0; // the in-game menu starts at x=0 and y=20
-        //int cursorPosY = 20;// just for info of starting coordinates - remove later
-        int menuWidth = 19; // in-game menu width and height
-        // int menuHeight = 19;
-
-        string[] textLines = {                     // array for all in-game menu frames
-                              "╔════════════╗",
-                              "              ",
-                              "╚════════════╝"
-                              };
-
-        #region Draw borders
-        // top line border print
-        Console.SetCursorPosition(20, 0);
-        Console.ForegroundColor = ConsoleColor.DarkCyan;
-        Console.WriteLine(new string('\u2588', menuWidth)); // using menuWidth as size
-
-        //bottom line border print
-        Console.SetCursorPosition(20, 19);
-        Console.ForegroundColor = ConsoleColor.DarkCyan;
-        Console.WriteLine(new string('\u2588', menuWidth));
-        Console.ForegroundColor = ConsoleColor.Black;
-
-        string[] gradientDivider = {"                 ",
-                                    "█▓▒░░._____.░░▒▓█"
-                                   };
-
-        for (int i = 0; i < gradientDivider.Length; i++)
-        {
-            Console.SetCursorPosition(21, i + 18);
-            Console.BackgroundColor = ConsoleColor.DarkCyan;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(gradientDivider[i]);
-            Console.ResetColor();
-        }
-        #endregion
-
-        #region teamNameTitle
-        Console.SetCursorPosition(24, 0);
-        Console.BackgroundColor = ConsoleColor.DarkCyan;
-        Console.ForegroundColor = ConsoleColor.Gray;
-        // Console.WriteLine("¸¸.•*¨*•♫♪");  // check this music for a game sound
-        Console.WriteLine("Team Centaur");
-        Console.SetCursorPosition(22, 0);
-        Console.WriteLine("◄");  //◄ ◄  ► ►     ← ← → →   ↑ ↑ ↓ ↓
-        Console.SetCursorPosition(36, 0);
-        Console.WriteLine(" ►");  //◄ ◄  ► ►     
-        Console.ResetColor();
-        #endregion
-
-        //start regions: Lifecounter(global variable NEEDED)  + ScoreCounter(global variable NEEDED) + LevelCounter (global variable USED hardcore)
-        #region LifeCounter
-
-        int lifesCounter = 4; // hardcored for now - take the global for lifes remaining after it is ready
-        string lifeText = " Lifes ► ";
-        Console.SetCursorPosition(23, 2);
-        switch (lifesCounter)
-        {
-            case 1:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 2);
-                        Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 3);
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(lifeText);
-                    Console.Write(new string((char)9787, 1));
-                    Console.ResetColor();
-                }
-                break;
-
-            case 2:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 2);
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 3);
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(lifeText);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 2));
-                    Console.ResetColor();
-                }
-                break;
-            case 3:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 2);
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 3);
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(lifeText);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 3));
-                    Console.ResetColor();
-                }
-                break;
-            case 4:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 2);
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 3);
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(lifeText);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 4));
-                    Console.ResetColor();
-                }
-                break;
-            case 5: 
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 2);
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 3);
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(lifeText);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(new string((char)9787, 5));
-                    Console.ResetColor();
-                }
-                break;
-            default: break;
-        }
-        #endregion // Lifecounter
-
-        #region ScoreCounter
-        for (int i = 0; i < textLines.Length; i++)
-        {
-            Console.SetCursorPosition(23, i + 5);
-            Console.BackgroundColor = ConsoleColor.DarkYellow;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(textLines[i]);
-            Console.ResetColor();
-        }
-        Console.SetCursorPosition(23, 6);
-        Console.BackgroundColor = ConsoleColor.DarkYellow;
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine(" SCORE ►{0,5} ", 230); // score hardcored for now - change later to active score variable
-        Console.ResetColor();
-        #endregion
-
-        #region LevelCounter
-
-        levelNumber = 1; // hardcored for now - take the global for lifes remaining after it is ready
-        string textLevel = " LEVEL ";
-
-        Console.SetCursorPosition(23, 8);
-        switch (levelNumber)
-        {
-            case 1:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 8);
-                        Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 9);
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
-                    Console.ResetColor();
-                }
-                break;
-            case 2:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 8);
-                        Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 9);
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
-                    Console.ResetColor();
-                }
-                break;
-            case 3:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 8);
-                        Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 9);
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
-                    Console.ResetColor();
-                }
-                break;
-            case 4:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 8);
-                        Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 9);
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
-                    Console.ResetColor();
-                }
-                break;
-            case 5:
-                {
-                    for (int i = 0; i < textLines.Length; i++)
-                    {
-                        Console.SetCursorPosition(23, i + 8);
-                        Console.BackgroundColor = ConsoleColor.DarkRed;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(textLines[i]);
-                        Console.ResetColor();
-                    }
-                    Console.SetCursorPosition(23, 9);
-                    Console.BackgroundColor = ConsoleColor.DarkRed;
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("{1}► {0,4}", levelNumber, textLevel);
-                    Console.ResetColor();
-                }
-                break;
-            default: break;
-        }
-        #endregion
-        //end regions: Lifecounter + ScoreCounter+ LevelCounter
-
-//        string[] pacmanEnemy = {
-//                               @"
-//                                ──▒▒▒▒▒──
-//                                ─▒─▄▒─▄▒─
-//                                ─▒▒▒▒▒▒▒─
-//                                ─▒▒▒▒▒▒▒─
-//                                ─▒─▒─▒─▒─" 
-//                               };
-//        for (int i = 0; i < pacmanEnemy.Length; i++)
-//        {
-//            Console.SetCursorPosition(20, i + 5);
-//            Console.BackgroundColor = ConsoleColor.DarkRed;
-//            Console.ForegroundColor = ConsoleColor.White;
-//            Console.Write(pacmanEnemy[i]);
-//            Console.ResetColor();
-//        }
-
-        // exit(game over) screen?
-        string[] centaurPic ={
-                      @" |__
-   --==/////////////[})))==*
-                     |\ '          ,|
-                       `\`\      //|'                           ,|
-                         \ `\  //,/'                          -~ |
-         )           _-~~~\  |/ / |'                       _-~  /  ,
-        )(          /'  )  | \ / /'                     _-~   _/_-~|
-       (( )         ;  /`  ' )/ /''                 _ -~     _-~ ,/'
-       ) )(         `~~\   `\\/'/|'           __--~~__--\ _-~  _/,
-      ((___)          / ~~    \ /~      __--~~  --~~  __/~  _-~ /
-        | |          |    )   | '      /        __--~~  \-~~ _-~
-         \(\    __--(   _/    |'\     /     --~~   __--~' _-~ ~|
-         (  ((~~   __-~        \~\   /     ___---~~  ~~\~~__--~
-         `~~\~~~~~~   `\-~      \~\ /           __--~~~'~~/
-                       ;\ __--~  ~-/      ~~~~~__\__---~~.,,,
-                       ;;;;;;;;'  /      ---~~~/__-----_;;;;;;;;,,
-                      ;;;;;;;'   /      ----~~/          \ `;;;;;;;;;;;;,
-                      ;;;;'     (      ---~~/         `:::|  `;;;;;;;;;;;;;;.
-                      |'  _      `----~~~~'      /      `:|    ;;;;;;;'  `;;'
-                ______/\/~    |                 /        /       `;;;;;   `;
-              /~;;.____/;;'  /          ___----(   `;;;/          ;;;
-             / //  _;______;'------~~~~~    |;;/\    /           ;;
-            //  \ \                        / ,|  \;;,\            `
-           (<_    \ \                    /',/-----'  _>
-            \_|     \\_                 //~;~~~~~~~~~
-                     \_|               (,~~   -Team Centaur
-                                        \~\
-                                         ~~"         
-                                     };
-        //for (int i = 0; i < centaurPic.Length; i++)               
-        //{
-        //    Console.SetCursorPosition(1, i + 1);
-        //    Console.BackgroundColor = ConsoleColor.DarkRed;
-        //    Console.ForegroundColor = ConsoleColor.White;
-        //    Console.Write(centaurPic[i]);
-        //    Console.ResetColor();
-        //}
-
-    }
-
+       
     private static void MovePacMan()
     {
         while (Console.KeyAvailable)
         {
-
+            
             // we assign the pressed key value to a variable pressedKey
             ConsoleKeyInfo pressedKey = Console.ReadKey(true);
             // next we start checking the value of the pressed key and take action if neccessary
-            if (pressedKey.Key == ConsoleKey.LeftArrow && pacMan.x > 1) // if left arrow is pressed then
+            if (pressedKey.Key == ConsoleKey.LeftArrow && pacMan.y > 1) // if left arrow is pressed then
             {
-                if (labyrinth[pacMan.y][pacMan.x - 1] != '\u2588')
-                {
-                    pacMan.x = pacMan.x - 1;
-                }
-            }
-            else if (pressedKey.Key == ConsoleKey.RightArrow && pacMan.x < playfieldWidth - 1)
-            {
-                if (labyrinth[pacMan.y][pacMan.x + 1] != '\u2588')
-                {
-
-                    pacMan.x = pacMan.x + 1;
-                }
-            }
-            else if (pressedKey.Key == ConsoleKey.UpArrow && pacMan.y > 1)
-            {
-                if (labyrinth[pacMan.y - 1][pacMan.x] != '\u2588')
+                if (labyrinth[pacMan.x][pacMan.y - 1] != '\u2588')
                 {
                     pacMan.y = pacMan.y - 1;
                 }
             }
-            else if (pressedKey.Key == ConsoleKey.DownArrow && pacMan.y < playfieldHeight - 1)
+            else if (pressedKey.Key == ConsoleKey.RightArrow && pacMan.y < playfieldWidth - 1)
             {
-                if (labyrinth[pacMan.y + 1][pacMan.x] != '\u2588')
+                if (labyrinth[pacMan.x][pacMan.y + 1] != '\u2588')
                 {
+
                     pacMan.y = pacMan.y + 1;
+                }
+            }
+            else if (pressedKey.Key == ConsoleKey.UpArrow && pacMan.x > 1)
+            {
+                if (labyrinth[pacMan.x - 1][pacMan.y] != '\u2588')
+                {
+                    pacMan.x = pacMan.x - 1;
+                }
+            }
+            else if (pressedKey.Key == ConsoleKey.DownArrow && pacMan.x < playfieldHeight - 1)
+            {
+                if (labyrinth[pacMan.x + 1][pacMan.y] != '\u2588')
+                {
+                    pacMan.x = pacMan.x + 1;
                 }
             }
         }
     }
-
-
-    #region EnemyMovements
-
-    private static void MoveEnemy1()
+    
+    private static void MoveEnemies(Creature[] enemy)
     {
-
-        /*Move enemy
-            1-right
-            2-left
-            3-up
-            4-down
-
-            */
-
-
-        var lastDirection = enemy.lastDirection;
-        //if enemy moves right START here COPY>>>>>
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588'))
+        for (int i = 0; i < enemiesCount; i++)
         {
-            enemy.direction = "down";
-            enemy.lastDirection = "right";
-        }
-
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "up";
-            enemy.lastDirection = "right";
-        }
-
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "left";
-            enemy.lastDirection = "right";
-        }
-
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == ' '))
-        {
-            //randomizer for enemy movements.
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(2);
-            if (enemyDirection == 0)
+            var lastDirection = enemy[i].lastDirection;
+            //if enemy[i] moves right START here COPY>>>>>
+            if (enemy[i].direction == "right" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "up";
+                enemy[i].direction = "down";
+                enemy[i].lastDirection = "right";
             }
-            else if (enemyDirection == 1)
-            {
-                enemy.direction = "down";
-            }
-            enemy.lastDirection = "right";
-        }
 
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            if (enemy[i].direction == "right" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "up";
+                enemy[i].direction = "up";
+                enemy[i].lastDirection = "right";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "right" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "right";
+                enemy[i].direction = "left";
+                enemy[i].lastDirection = "right";
             }
-            enemy.lastDirection = "right";
-        }
 
-        if (enemy.direction == "right" && (labyrinth[enemy.y][enemy.x + 1] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            if (enemy[i].direction == "right" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' '))
             {
-                enemy.direction = "down";
+                //randomizer for enemy[i] movements.
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(2);
+                if (enemyDirection == 0)
+                {
+                    enemy[i].direction = "up";
+                }
+                else if (enemyDirection == 1)
+                {
+                    enemy[i].direction = "down";
+                }
+                enemy[i].lastDirection = "right";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "right" && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' '))
             {
-                enemy.direction = "right";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "up";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "right";
+                }
+                enemy[i].lastDirection = "right";
             }
-            enemy.lastDirection = "right";
-        }
-        //if enemy moves right END here
 
-        //if enemy moves down START here
-        if (enemy.direction == "down" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "left";
-            enemy.lastDirection = "down";
-        }
-
-        if (enemy.direction == "down" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "right";
-            enemy.lastDirection = "down";
-        }
-
-        if (enemy.direction == "down" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x + 1] == '\u2588'))
-        {
-            enemy.direction = "up";
-            enemy.lastDirection = "down";
-        }
-
-        if (enemy.direction == "down" && (labyrinth[enemy.y][enemy.x + 1] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x - 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(2);
-            if (enemyDirection == 0)
+            if (enemy[i].direction == "right" && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' '))
             {
-                enemy.direction = "right";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "down";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "right";
+                }
+                enemy[i].lastDirection = "right";
             }
-            else if (enemyDirection == 1)
-            {
-                enemy.direction = "left";
-            }
-            enemy.lastDirection = "down";
-        }
+            //if enemy[i] moves right END here
 
-        if (enemy.direction == "down" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            //if enemy[i] moves down START here
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "left";
+                enemy[i].direction = "left";
+                enemy[i].lastDirection = "down";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "down";
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "down";
             }
-            enemy.lastDirection = "down";
-        }
 
-        if (enemy.direction == "down" && (labyrinth[enemy.y][enemy.x + 1] == ' ') && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588'))
             {
-                enemy.direction = "right";
+                enemy[i].direction = "up";
+                enemy[i].lastDirection = "down";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' '))
             {
-                enemy.direction = "down";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(2);
+                if (enemyDirection == 0)
+                {
+                    enemy[i].direction = "right";
+                }
+                else if (enemyDirection == 1)
+                {
+                    enemy[i].direction = "left";
+                }
+                enemy[i].lastDirection = "down";
             }
-            enemy.lastDirection = "down";
-        }
-        //if enemy moves down END here
-        //if enemy moves left START here
-        if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "up";
-            enemy.lastDirection = "left";
-        }
 
-        if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "down";
-            enemy.lastDirection = "left";
-        }
-
-        if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "right";
-            enemy.lastDirection = "left";
-        }
-
-        if (enemy.direction == "left" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(2);
-            if (enemyDirection == 0)
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' '))
             {
-                enemy.direction = "up";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "left";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "down";
+                }
+                enemy[i].lastDirection = "down";
             }
-            else if (enemyDirection == 1)
+
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' ') && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' '))
             {
-                enemy.direction = "down";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "right";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "down";
+                }
+                enemy[i].lastDirection = "down";
             }
-            enemy.lastDirection = "left";
-        }
-
-        if (enemy.direction == "left" && (labyrinth[enemy.y - 1][enemy.x] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == ' ') && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y][enemy.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            //if enemy[i] moves down END here
+            //if enemy[i] moves left START here
+            if (enemy[i].direction == "left" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "down";
+                enemy[i].direction = "up";
+                enemy[i].lastDirection = "left";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "left" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "left";
+                enemy[i].direction = "down";
+                enemy[i].lastDirection = "left";
             }
-            enemy.lastDirection = "left";
-        }
 
-        if (enemy.direction == "left" && (labyrinth[enemy.y - 1][enemy.x] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y][enemy.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            if (enemy[i].direction == "left" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "up";
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "left";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "left" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' '))
             {
-                enemy.direction = "left";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(2);
+                if (enemyDirection == 0)
+                {
+                    enemy[i].direction = "up";
+                }
+                else if (enemyDirection == 1)
+                {
+                    enemy[i].direction = "down";
+                }
+                enemy[i].lastDirection = "left";
             }
-            enemy.lastDirection = "left";
-        }
-        //if enemy moves left END here
 
-        //if enemy moves up START here
-        if (enemy.direction == "up" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "right";
-            enemy.lastDirection = "up";
-        }
-
-        if (enemy.direction == "up" && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588'))
-        {
-            enemy.direction = "left";
-            enemy.lastDirection = "up";
-        }
-
-        if (enemy.direction == "up" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x + 1] == '\u2588'))
-        {
-            enemy.direction = "down";
-            enemy.lastDirection = "up";
-        }
-
-        if (enemy.direction == "up" && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == '\u2588') && (labyrinth[enemy.y][enemy.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(2);
-            if (enemyDirection == 0)
+            if (enemy[i].direction == "left" && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' '))
             {
-                enemy.direction = "left";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "down";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "left";
+                }
+                enemy[i].lastDirection = "left";
             }
-            else if (enemyDirection == 1)
+
+            if (enemy[i].direction == "left" && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' '))
             {
-                enemy.direction = "right";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "up";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "left";
+                }
+                enemy[i].lastDirection = "left";
             }
-            enemy.lastDirection = "up";
-        }
+            //if enemy[i] moves left END here
 
-        if (enemy.direction == "up" && (labyrinth[enemy.y][enemy.x - 1] == ' ') && (labyrinth[enemy.y][enemy.x + 1] == '\u2588') && (labyrinth[enemy.y + 1][enemy.x] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            //if enemy[i] moves up START here
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "left";
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "up";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
-                enemy.direction = "up";
+                enemy[i].direction = "left";
+                enemy[i].lastDirection = "up";
             }
-            enemy.lastDirection = "up";
-        }
 
-        if (enemy.direction == "up" && (labyrinth[enemy.y][enemy.x - 1] == '\u2588') && (labyrinth[enemy.y][enemy.x + 1] == ' ') && (labyrinth[enemy.y + 1][enemy.x] == ' ') && (labyrinth[enemy.y - 1][enemy.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemyDirection = randomDirection.Next(9);
-            if (enemyDirection % 8 == 0)
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588'))
             {
-                enemy.direction = "right";
+                enemy[i].direction = "down";
+                enemy[i].lastDirection = "up";
             }
-            else if (enemyDirection % 8 != 0)
+
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' '))
             {
-                enemy.direction = "up";
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(2);
+                if (enemyDirection == 0)
+                {
+                    enemy[i].direction = "left";
+                }
+                else if (enemyDirection == 1)
+                {
+                    enemy[i].direction = "right";
+                }
+                enemy[i].lastDirection = "up";
             }
-            enemy.lastDirection = "up";
-        }
-        //if enemy moves left Up here COPY>>>>
 
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y - 1] == ' ') && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' '))
+            {
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "left";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "up";
+                }
+                enemy[i].lastDirection = "up";
+            }
 
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x][enemy[i].y + 1] == ' ') && (labyrinth[enemy[i].x + 1][enemy[i].y] == ' ') && (labyrinth[enemy[i].x - 1][enemy[i].y] == ' '))
+            {
+                Random randomDirection = new Random();
+                int enemyDirection = randomDirection.Next(9);
+                if (enemyDirection % 8 == 0)
+                {
+                    enemy[i].direction = "right";
+                }
+                else if (enemyDirection % 8 != 0)
+                {
+                    enemy[i].direction = "up";
+                }
+                enemy[i].lastDirection = "up";
+            }
 
-
-        if (enemy.direction == "right")
-        {
-            enemy.x += 1;
-        }
-        if (enemy.direction == "down")
-        {
-            enemy.y += 1;
-        }
-        if (enemy.direction == "left")
-        {
-            enemy.x -= 1;
-        }
-        if (enemy.direction == "up")
-        {
-            enemy.y -= 1;
+            //if enemy[i] moves left Up here COPY>>>>
+            if (enemy[i].direction == "right")
+            {
+                enemy[i].y += 1;
+            }
+            if (enemy[i].direction == "down")
+            {
+                enemy[i].x += 1;
+            }
+            if (enemy[i].direction == "left")
+            {
+                enemy[i].y -= 1;
+            }
+            if (enemy[i].direction == "up")
+            {
+                enemy[i].x -= 1;
+            }
         }
     }
 
-    private static void MoveEnemy2()
-    {
-        /*Move enemy2
-            1-right
-            2-left
-            3-up
-            4-down
-
-            */
-        var lastDirection = enemy2.lastDirection;
-        //if enemy2 moves right START here   COPY>>>>
-        if (enemy2.direction == "right" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "down";
-            enemy2.lastDirection = "right";
-        }
-
-        if (enemy2.direction == "right" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "up";
-            enemy2.lastDirection = "right";
-        }
-
-        if (enemy2.direction == "right" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "left";
-            enemy2.lastDirection = "right";
-        }
-
-        if (enemy2.direction == "right" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(2);
-            if (enemy2Direction == 0)
-            {
-                enemy2.direction = "up";
-            }
-            else if (enemy2Direction == 1)
-            {
-                enemy2.direction = "down";
-            }
-            enemy2.lastDirection = "right";
-        }
-
-        if (enemy2.direction == "right" && (labyrinth[enemy2.y][enemy2.x + 1] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "up";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "right";
-            }
-            enemy2.lastDirection = "right";
-        }
-
-        if (enemy2.direction == "right" && (labyrinth[enemy2.y][enemy2.x + 1] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "down";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "right";
-            }
-            enemy2.lastDirection = "right";
-        }
-        //if enemy2 moves right END here
-
-        //if enemy2 moves down START here
-        if (enemy2.direction == "down" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "left";
-            enemy2.lastDirection = "down";
-        }
-
-        if (enemy2.direction == "down" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "right";
-            enemy2.lastDirection = "down";
-        }
-
-        if (enemy2.direction == "down" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588'))
-        {
-            enemy2.direction = "up";
-            enemy2.lastDirection = "down";
-        }
-
-        if (enemy2.direction == "down" && (labyrinth[enemy2.y][enemy2.x + 1] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x - 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(2);
-            if (enemy2Direction == 0)
-            {
-                enemy2.direction = "right";
-            }
-            else if (enemy2Direction == 1)
-            {
-                enemy2.direction = "left";
-            }
-            enemy2.lastDirection = "down";
-        }
-
-        if (enemy2.direction == "down" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "left";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "down";
-            }
-            enemy2.lastDirection = "down";
-        }
-
-        if (enemy2.direction == "down" && (labyrinth[enemy2.y][enemy2.x + 1] == ' ') && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "right";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "down";
-            }
-            enemy2.lastDirection = "down";
-        }
-        //if enemy2 moves down END here
-        //if enemy2 moves left START here
-        if (enemy2.direction == "left" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "up";
-            enemy2.lastDirection = "left";
-        }
-
-        if (enemy2.direction == "left" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "down";
-            enemy2.lastDirection = "left";
-        }
-
-        if (enemy2.direction == "left" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "right";
-            enemy2.lastDirection = "left";
-        }
-
-        if (enemy2.direction == "left" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(2);
-            if (enemy2Direction == 0)
-            {
-                enemy2.direction = "up";
-            }
-            else if (enemy2Direction == 1)
-            {
-                enemy2.direction = "down";
-            }
-            enemy2.lastDirection = "left";
-        }
-
-        if (enemy2.direction == "left" && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == ' ') && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y][enemy2.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "down";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "left";
-            }
-            enemy2.lastDirection = "left";
-        }
-
-        if (enemy2.direction == "left" && (labyrinth[enemy2.y - 1][enemy2.x] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y][enemy2.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "up";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "left";
-            }
-            enemy2.lastDirection = "left";
-        }
-        //if enemy2 moves left END here
-
-        //if enemy2 moves up START here
-        if (enemy2.direction == "up" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "right";
-            enemy2.lastDirection = "up";
-        }
-
-        if (enemy2.direction == "up" && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588'))
-        {
-            enemy2.direction = "left";
-            enemy2.lastDirection = "up";
-        }
-
-        if (enemy2.direction == "up" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588'))
-        {
-            enemy2.direction = "down";
-            enemy2.lastDirection = "up";
-        }
-
-        if (enemy2.direction == "up" && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == '\u2588') && (labyrinth[enemy2.y][enemy2.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(2);
-            if (enemy2Direction == 0)
-            {
-                enemy2.direction = "left";
-            }
-            else if (enemy2Direction == 1)
-            {
-                enemy2.direction = "right";
-            }
-            enemy2.lastDirection = "up";
-        }
-
-        if (enemy2.direction == "up" && (labyrinth[enemy2.y][enemy2.x - 1] == ' ') && (labyrinth[enemy2.y][enemy2.x + 1] == '\u2588') && (labyrinth[enemy2.y + 1][enemy2.x] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "left";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "up";
-            }
-            enemy2.lastDirection = "up";
-        }
-
-        if (enemy2.direction == "up" && (labyrinth[enemy2.y][enemy2.x - 1] == '\u2588') && (labyrinth[enemy2.y][enemy2.x + 1] == ' ') && (labyrinth[enemy2.y + 1][enemy2.x] == ' ') && (labyrinth[enemy2.y - 1][enemy2.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy2Direction = randomDirection.Next(9);
-            if (enemy2Direction % 8 == 0)
-            {
-                enemy2.direction = "right";
-            }
-            else if (enemy2Direction % 8 != 0)
-            {
-                enemy2.direction = "up";
-            }
-            enemy2.lastDirection = "up";
-        }
-        //if enemy2 moves Up END here COPY>>>>>
-
-
-
-
-        if (enemy2.direction == "right")
-        {
-            enemy2.x += 1;
-        }
-        if (enemy2.direction == "down")
-        {
-            enemy2.y += 1;
-        }
-        if (enemy2.direction == "left")
-        {
-            enemy2.x -= 1;
-        }
-        if (enemy2.direction == "up")
-        {
-            enemy2.y -= 1;
-        }
-    }
-
-    private static void MoveEnemy3()
-    {
-
-        /*Move enemy3
-            1-right
-            2-left
-            3-up
-            4-down
-
-            */
-
-
-        var lastDirection = enemy3.lastDirection;
-        //if enemy3 moves right START here COPY>>>>>
-        if (enemy3.direction == "right" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "down";
-            enemy3.lastDirection = "right";
-        }
-
-        if (enemy3.direction == "right" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "up";
-            enemy3.lastDirection = "right";
-        }
-
-        if (enemy3.direction == "right" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "left";
-            enemy3.lastDirection = "right";
-        }
-
-        if (enemy3.direction == "right" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(2);
-            if (enemy3Direction == 0)
-            {
-                enemy3.direction = "up";
-            }
-            else if (enemy3Direction == 1)
-            {
-                enemy3.direction = "down";
-            }
-            enemy3.lastDirection = "right";
-        }
-
-        if (enemy3.direction == "right" && (labyrinth[enemy3.y][enemy3.x + 1] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "up";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "right";
-            }
-            enemy3.lastDirection = "right";
-        }
-
-        if (enemy3.direction == "right" && (labyrinth[enemy3.y][enemy3.x + 1] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "down";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "right";
-            }
-            enemy3.lastDirection = "right";
-        }
-        //if enemy3 moves right END here
-
-        //if enemy3 moves down START here
-        if (enemy3.direction == "down" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "left";
-            enemy3.lastDirection = "down";
-        }
-
-        if (enemy3.direction == "down" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "right";
-            enemy3.lastDirection = "down";
-        }
-
-        if (enemy3.direction == "down" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588'))
-        {
-            enemy3.direction = "up";
-            enemy3.lastDirection = "down";
-        }
-
-        if (enemy3.direction == "down" && (labyrinth[enemy3.y][enemy3.x + 1] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x - 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(2);
-            if (enemy3Direction == 0)
-            {
-                enemy3.direction = "right";
-            }
-            else if (enemy3Direction == 1)
-            {
-                enemy3.direction = "left";
-            }
-            enemy3.lastDirection = "down";
-        }
-
-        if (enemy3.direction == "down" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "left";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "down";
-            }
-            enemy3.lastDirection = "down";
-        }
-
-        if (enemy3.direction == "down" && (labyrinth[enemy3.y][enemy3.x + 1] == ' ') && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "right";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "down";
-            }
-            enemy3.lastDirection = "down";
-        }
-        //if enemy3 moves down END here
-        //if enemy3 moves left START here
-        if (enemy3.direction == "left" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "up";
-            enemy3.lastDirection = "left";
-        }
-
-        if (enemy3.direction == "left" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "down";
-            enemy3.lastDirection = "left";
-        }
-
-        if (enemy3.direction == "left" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "right";
-            enemy3.lastDirection = "left";
-        }
-
-        if (enemy3.direction == "left" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(2);
-            if (enemy3Direction == 0)
-            {
-                enemy3.direction = "up";
-            }
-            else if (enemy3Direction == 1)
-            {
-                enemy3.direction = "down";
-            }
-            enemy3.lastDirection = "left";
-        }
-
-        if (enemy3.direction == "left" && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == ' ') && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y][enemy3.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "down";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "left";
-            }
-            enemy3.lastDirection = "left";
-        }
-
-        if (enemy3.direction == "left" && (labyrinth[enemy3.y - 1][enemy3.x] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y][enemy3.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "up";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "left";
-            }
-            enemy3.lastDirection = "left";
-        }
-        //if enemy3 moves left END here
-
-        //if enemy3 moves up START here
-        if (enemy3.direction == "up" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "right";
-            enemy3.lastDirection = "up";
-        }
-
-        if (enemy3.direction == "up" && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588'))
-        {
-            enemy3.direction = "left";
-            enemy3.lastDirection = "up";
-        }
-
-        if (enemy3.direction == "up" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588'))
-        {
-            enemy3.direction = "down";
-            enemy3.lastDirection = "up";
-        }
-
-        if (enemy3.direction == "up" && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == '\u2588') && (labyrinth[enemy3.y][enemy3.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(2);
-            if (enemy3Direction == 0)
-            {
-                enemy3.direction = "left";
-            }
-            else if (enemy3Direction == 1)
-            {
-                enemy3.direction = "right";
-            }
-            enemy3.lastDirection = "up";
-        }
-
-        if (enemy3.direction == "up" && (labyrinth[enemy3.y][enemy3.x - 1] == ' ') && (labyrinth[enemy3.y][enemy3.x + 1] == '\u2588') && (labyrinth[enemy3.y + 1][enemy3.x] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "left";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "up";
-            }
-            enemy3.lastDirection = "up";
-        }
-
-        if (enemy3.direction == "up" && (labyrinth[enemy3.y][enemy3.x - 1] == '\u2588') && (labyrinth[enemy3.y][enemy3.x + 1] == ' ') && (labyrinth[enemy3.y + 1][enemy3.x] == ' ') && (labyrinth[enemy3.y - 1][enemy3.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy3Direction = randomDirection.Next(9);
-            if (enemy3Direction % 8 == 0)
-            {
-                enemy3.direction = "right";
-            }
-            else if (enemy3Direction % 8 != 0)
-            {
-                enemy3.direction = "up";
-            }
-            enemy3.lastDirection = "up";
-        }
-        //if enemy3 moves Up END here COPY>>>>
-
-
-
-
-        if (enemy3.direction == "right")
-        {
-            enemy3.x += 1;
-        }
-        if (enemy3.direction == "down")
-        {
-            enemy3.y += 1;
-        }
-        if (enemy3.direction == "left")
-        {
-            enemy3.x -= 1;
-        }
-        if (enemy3.direction == "up")
-        {
-            enemy3.y -= 1;
-        }
-    }
-
-
-    private static void MoveEnemy4()
-    {
-        /*Move enemy4
-            1-right
-            2-left
-            3-up
-            4-down
-
-            */
-        var lastDirection = enemy4.lastDirection;
-        //if enemy4 moves right START here   COPY>>>>
-        if (enemy4.direction == "right" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "down";
-            enemy4.lastDirection = "right";
-        }
-
-        if (enemy4.direction == "right" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "up";
-            enemy4.lastDirection = "right";
-        }
-
-        if (enemy4.direction == "right" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "left";
-            enemy4.lastDirection = "right";
-        }
-
-        if (enemy4.direction == "right" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(2);
-            if (enemy4Direction == 0)
-            {
-                enemy4.direction = "up";
-            }
-            else if (enemy4Direction == 1)
-            {
-                enemy4.direction = "down";
-            }
-            enemy4.lastDirection = "right";
-        }
-
-        if (enemy4.direction == "right" && (labyrinth[enemy4.y][enemy4.x + 1] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "up";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "right";
-            }
-            enemy4.lastDirection = "right";
-        }
-
-        if (enemy4.direction == "right" && (labyrinth[enemy4.y][enemy4.x + 1] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "down";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "right";
-            }
-            enemy4.lastDirection = "right";
-        }
-        //if enemy4 moves right END here
-
-        //if enemy4 moves down START here
-        if (enemy4.direction == "down" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "left";
-            enemy4.lastDirection = "down";
-        }
-
-        if (enemy4.direction == "down" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "right";
-            enemy4.lastDirection = "down";
-        }
-
-        if (enemy4.direction == "down" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588'))
-        {
-            enemy4.direction = "up";
-            enemy4.lastDirection = "down";
-        }
-
-        if (enemy4.direction == "down" && (labyrinth[enemy4.y][enemy4.x + 1] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x - 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(2);
-            if (enemy4Direction == 0)
-            {
-                enemy4.direction = "right";
-            }
-            else if (enemy4Direction == 1)
-            {
-                enemy4.direction = "left";
-            }
-            enemy4.lastDirection = "down";
-        }
-
-        if (enemy4.direction == "down" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "left";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "down";
-            }
-            enemy4.lastDirection = "down";
-        }
-
-        if (enemy4.direction == "down" && (labyrinth[enemy4.y][enemy4.x + 1] == ' ') && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "right";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "down";
-            }
-            enemy4.lastDirection = "down";
-        }
-        //if enemy4 moves down END here
-        //if enemy4 moves left START here
-        if (enemy4.direction == "left" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "up";
-            enemy4.lastDirection = "left";
-        }
-
-        if (enemy4.direction == "left" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "down";
-            enemy4.lastDirection = "left";
-        }
-
-        if (enemy4.direction == "left" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "right";
-            enemy4.lastDirection = "left";
-        }
-
-        if (enemy4.direction == "left" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(2);
-            if (enemy4Direction == 0)
-            {
-                enemy4.direction = "up";
-            }
-            else if (enemy4Direction == 1)
-            {
-                enemy4.direction = "down";
-            }
-            enemy4.lastDirection = "left";
-        }
-
-        if (enemy4.direction == "left" && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == ' ') && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y][enemy4.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "down";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "left";
-            }
-            enemy4.lastDirection = "left";
-        }
-
-        if (enemy4.direction == "left" && (labyrinth[enemy4.y - 1][enemy4.x] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y][enemy4.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "up";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "left";
-            }
-            enemy4.lastDirection = "left";
-        }
-        //if enemy4 moves left END here
-
-        //if enemy4 moves up START here
-        if (enemy4.direction == "up" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "right";
-            enemy4.lastDirection = "up";
-        }
-
-        if (enemy4.direction == "up" && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588'))
-        {
-            enemy4.direction = "left";
-            enemy4.lastDirection = "up";
-        }
-
-        if (enemy4.direction == "up" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588'))
-        {
-            enemy4.direction = "down";
-            enemy4.lastDirection = "up";
-        }
-
-        if (enemy4.direction == "up" && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == '\u2588') && (labyrinth[enemy4.y][enemy4.x + 1] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(2);
-            if (enemy4Direction == 0)
-            {
-                enemy4.direction = "left";
-            }
-            else if (enemy4Direction == 1)
-            {
-                enemy4.direction = "right";
-            }
-            enemy4.lastDirection = "up";
-        }
-
-        if (enemy4.direction == "up" && (labyrinth[enemy4.y][enemy4.x - 1] == ' ') && (labyrinth[enemy4.y][enemy4.x + 1] == '\u2588') && (labyrinth[enemy4.y + 1][enemy4.x] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "left";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "up";
-            }
-            enemy4.lastDirection = "up";
-        }
-
-        if (enemy4.direction == "up" && (labyrinth[enemy4.y][enemy4.x - 1] == '\u2588') && (labyrinth[enemy4.y][enemy4.x + 1] == ' ') && (labyrinth[enemy4.y + 1][enemy4.x] == ' ') && (labyrinth[enemy4.y - 1][enemy4.x] == ' '))
-        {
-            Random randomDirection = new Random();
-            int enemy4Direction = randomDirection.Next(9);
-            if (enemy4Direction % 8 == 0)
-            {
-                enemy4.direction = "right";
-            }
-            else if (enemy4Direction % 8 != 0)
-            {
-                enemy4.direction = "up";
-            }
-            enemy4.lastDirection = "up";
-        }
-        //if enemy4 moves left END here COPY>>>>>
-
-
-
-
-        if (enemy4.direction == "right")
-        {
-            enemy4.x += 1;
-        }
-        if (enemy4.direction == "down")
-        {
-            enemy4.y += 1;
-        }
-        if (enemy4.direction == "left")
-        {
-            enemy4.x -= 1;
-        }
-        if (enemy4.direction == "up")
-        {
-            enemy4.y -= 1;
-        }
-    }
-
-    #endregion
     static string[,] ReadLevelsFromFile(int playfieldHeight, int playfieldWidth)
     {
         //Read all the levels from the file.
 
         //Create StreamReader for Levels.txt file.
-        StreamReader streamReader = new StreamReader("Levels.txt");
+        StreamReader streamReader = new StreamReader(@"..\..\Levels.txt");
 
         //Create list for all levels.
         List<string[]> listOfLevels = new List<string[]>();
@@ -1833,7 +526,7 @@ class PacMan3D
         }
 
         int count = listOfLevels.Count;
-
+        
 
         //String array for all the levels.
         string[,] levels = new string[count, playfieldWidth];
@@ -1843,7 +536,7 @@ class PacMan3D
         {
             for (int k = 0; k < playfieldWidth; k++)
             {
-
+                
                 levels[j, k] = listOfLevels[j][k];
             }
         }
@@ -1851,7 +544,7 @@ class PacMan3D
         //Return the 2D string array with all levels.
         return levels;
     }
-
+    
     static string[] selectLevel(string[,] allLevels, int levelNumber)
     {
         //Select the wanted level from the 2D array.
@@ -1874,22 +567,11 @@ class PacMan3D
         //Return string array with the selected level.
         return selectedLevel;
     }
-
-    private static void SetPlayfieldSize(out int playfieldHeight, out int playfieldWidth)
-    {
-        // set console size (screen resolution)
-        Console.BufferHeight = Console.WindowHeight = 21;
-        Console.BufferWidth = Console.WindowWidth = 40;
-
-        // set playfield size
-        playfieldHeight = Console.WindowHeight - 1;
-        playfieldWidth = Console.WindowWidth - 20;
-    }
-
-    static void PrintElement(Element thisObject)
+    
+    static void PrintElement(Creature thisObject)
     {
         // print object of type Element
-        Console.SetCursorPosition(thisObject.x, thisObject.y);
+        Console.SetCursorPosition(thisObject.y, thisObject.x);
         Console.ForegroundColor = thisObject.colour;
         Console.Write(thisObject.skin);
     }
@@ -1903,7 +585,6 @@ class PacMan3D
             Console.WriteLine(thisArray[i]);
         }
     }
-
 
     static void StartupScreen()
     {
@@ -1926,7 +607,7 @@ class PacMan3D
         }
 
         PrintSmileyArray(smileyFace); //Printing border (smileyface array) and Pac Man "Logo"
-        PrintPacManLogo();
+        PrintPacManLogo(); 
 
         int cursorPositionX = Console.BufferWidth / 7; //Set print positions for menu options ("New Game" and "Read Instructions")
         int cursorPositionY = Console.BufferHeight - 5;
@@ -1983,7 +664,7 @@ class PacMan3D
                         Console.Clear();
 
                         PrintSmileyArray(smileyFace);
-
+                        
                         Console.ForegroundColor = ConsoleColor.Gray;
                         PrintPacManLogo();
 
@@ -2002,10 +683,10 @@ class PacMan3D
                 if (pressedKeyValue == 1 && key == ConsoleKey.Enter) //">>" will be at "Read Instructions" and after
                 {                                                    //presing {Enter} Instructions submenu will appear.
                     Console.Beep();
-                    Console.Clear();
+                    Console.Clear();                                                       
                     PrintSmileyArray(smileyFace);
                     PrintInstructions();
-
+                    
                     if (key == ConsoleKey.Escape) //Goes back to main start menu
                     {
                         pressedKeyValue = 0;
@@ -2013,7 +694,7 @@ class PacMan3D
                 }
             }
         }
-
+        
     }
 
     static void PrintSmileyArray(char[,] smileyFace)
@@ -2061,11 +742,11 @@ class PacMan3D
                       "\u2588  \u2588\u2588",
                       "\u2588   \u2588"
                      };
-        string[] three = {"\u2588\u2588\u2588\u2588\u2588", 
+        string[] three = {"\u2588\u2588\u2588\u2588", 
                           "    \u2588",
-                          "\u2588\u2588\u2588\u2588\u2588",
+                          "\u2588\u2588\u2588\u2588",
                           "    \u2588",
-                          "\u2588\u2588\u2588\u2588\u2588"
+                          "\u2588\u2588\u2588\u2588"
                      };
         string[] D = {"\u2588\u2588\u2588", 
                       "\u2588   \u2588",
@@ -2073,12 +754,12 @@ class PacMan3D
                       "\u2588   \u2588",
                       "\u2588\u2588\u2588"
                      };
-
+        
         for (int i = 0; i < P.Length; i++)
-        {
-            Console.SetCursorPosition(4, i + 4);
-            Console.Write(P[i]);
-        }
+			{
+              Console.SetCursorPosition(4, i + 4);
+			  Console.Write(P[i]);
+			}
 
         Console.SetCursorPosition(9, 7);
         for (int i = 0; i < P.Length; i++)
@@ -2138,7 +819,7 @@ class PacMan3D
         Console.SetCursorPosition(1, 6);
         Console.WriteLine("pieces and earning points. Once the");
         Console.SetCursorPosition(1, 7);
-        Console.WriteLine("player has collected a certain amount");
+        Console.WriteLine("player has collected a certain amount"); 
         Console.SetCursorPosition(1, 8);
         Console.WriteLine("of points, a secret portal opens to");
         Console.SetCursorPosition(1, 9);
