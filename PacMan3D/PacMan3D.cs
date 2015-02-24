@@ -45,7 +45,10 @@ class PacMan3DGame
 
     // Enemy Even move counter
     private static long enemyEvenMoveCounter = 1;
-    private static Random randomizer = new Random();    
+    private static Random randomizer = new Random();
+    //Gold
+    private static Creature gold = new Creature(1, 1, '$', ConsoleColor.Yellow);
+    private static int score = 0;
     
     static void Main()
     {
@@ -87,6 +90,7 @@ class PacMan3DGame
                 enemies[i].direction = "down";
             }
         }
+       
 
         StartupScreen();
 
@@ -104,6 +108,11 @@ class PacMan3DGame
 
             // detect pacman movement every frame redraw
             MovePacMan();
+            if ((pacMan.x == gold.x) && (pacMan.y == gold.y) && gold.skin == '$')
+            {
+                gold.skin = ' ';
+                score++;
+            }
 
             //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
             CheckForImpact();
@@ -138,6 +147,7 @@ class PacMan3DGame
     {
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
+        PrintElement(gold);
         PrintElement(pacMan);
         // print all enemies
         for (int i = 0; i < enemiesCount; i++)
@@ -154,14 +164,14 @@ class PacMan3DGame
             // we assign the pressed key value to a variable pressedKey
             ConsoleKeyInfo pressedKey = Console.ReadKey(true);
             // next we start checking the value of the pressed key and take action if neccessary
-            if (pressedKey.Key == ConsoleKey.LeftArrow && pacMan.y > 1) // if left arrow is pressed then
+            if (pressedKey.Key == ConsoleKey.LeftArrow) // if left arrow is pressed then
             {
                 if (labyrinth[pacMan.x][pacMan.y - 1] != '\u2588')
                 {
                     pacMan.y = pacMan.y - 1;
                 }
             }
-            else if (pressedKey.Key == ConsoleKey.RightArrow && pacMan.y < playfieldWidth - 1)
+            else if (pressedKey.Key == ConsoleKey.RightArrow)
             {
                 if (labyrinth[pacMan.x][pacMan.y + 1] != '\u2588')
                 {
@@ -169,21 +179,23 @@ class PacMan3DGame
                     pacMan.y = pacMan.y + 1;
                 }
             }
-            else if (pressedKey.Key == ConsoleKey.UpArrow && pacMan.x > 1)
+            else if (pressedKey.Key == ConsoleKey.UpArrow )
             {
                 if (labyrinth[pacMan.x - 1][pacMan.y] != '\u2588')
                 {
                     pacMan.x = pacMan.x - 1;
                 }
             }
-            else if (pressedKey.Key == ConsoleKey.DownArrow && pacMan.x < playfieldHeight - 1)
+            else if (pressedKey.Key == ConsoleKey.DownArrow )
             {
                 if (labyrinth[pacMan.x + 1][pacMan.y] != '\u2588')
                 {
                     pacMan.x = pacMan.x + 1;
                 }
             }
+          
         }
+       
     }
     
     private static void MoveEnemies(Creature[] enemy)
@@ -475,7 +487,7 @@ class PacMan3DGame
         //Read all the levels from the file.
 
         //Create StreamReader for Levels.txt file.
-        StreamReader streamReader = new StreamReader("Levels.txt");
+        StreamReader streamReader = new StreamReader(@"..\..\Levels.txt");
 
         //Create list for all levels.
         List<string[]> listOfLevels = new List<string[]>();
