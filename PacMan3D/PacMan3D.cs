@@ -94,7 +94,7 @@ class PacMan3DGame
         while (true)
         {
             //The array labyrinth is equal to the current level we select.
-            labyrinth = selectLevel(allLevels, levelNumber);
+            //labyrinth = selectLevel(allLevels, levelNumber);
 
             // Move the enemy per 2 steps
             if (enemyEvenMoveCounter % 2 == 0)
@@ -475,7 +475,7 @@ class PacMan3DGame
         //Read all the levels from the file.
 
         //Create StreamReader for Levels.txt file.
-        StreamReader streamReader = new StreamReader("Levels.txt");
+        StreamReader streamReader = new StreamReader(@"..\..\Levels.txt");
 
         //Create list for all levels.
         List<string[]> listOfLevels = new List<string[]>();
