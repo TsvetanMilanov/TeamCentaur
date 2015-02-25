@@ -52,11 +52,14 @@ class PacMan3DGame
         // set console size (screen resolution)
         Console.BufferHeight = Console.WindowHeight = 21;
         Console.BufferWidth = Console.WindowWidth = 40;
+        
+        StartupScreen();
 
         // labyrinth initializer
         int levelNumber = 0; //The number of the level which will be printed.
         int levelsCount = 4; //The count of all the levels in Levels.txt file.
         //2D string array which will contain all the levels.
+        Begin:
         string[,] allLevels = new string[levelsCount, playfieldWidth];
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
@@ -88,7 +91,6 @@ class PacMan3DGame
             }
         }
 
-        StartupScreen();
 
         // Main game logic
         while (true)
@@ -107,7 +109,21 @@ class PacMan3DGame
 
             //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
             CheckForImpact();
-
+            //Go pass thru this ultra-mega-hyper-galactic portal
+            if (labyrinth[pacMan.x][pacMan.y] == '\u0040')
+            {
+                levelNumber++;
+                pacMan.x = playfieldWidth / 2;
+                pacMan.y = playfieldHeight / 2;
+                goto Begin;
+            }
+            if (labyrinth[pacMan.x][pacMan.y] == '\u0023')
+            {
+                levelNumber--;
+                pacMan.x = playfieldWidth / 2;
+                pacMan.y = playfieldHeight / 2;
+                goto Begin;
+            }
             //CheckForImpact gives true or false on isGameOver
             if (isGameOver)
             {
@@ -263,7 +279,12 @@ class PacMan3DGame
                 enemy[i].direction = "left";
                 enemy[i].lastDirection = "down";
             }
-
+            //checking for portal
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u0040'))
+            {
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "down";
+            }
             if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
                 enemy[i].direction = "right";
@@ -392,7 +413,11 @@ class PacMan3DGame
                 enemy[i].direction = "right";
                 enemy[i].lastDirection = "up";
             }
-
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x-1][enemy[i].y] == '\u0023'))
+            {
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "up";
+            }
             if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
                 enemy[i].direction = "left";
