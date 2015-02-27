@@ -12,3 +12,10 @@ D:\telerik\game\github\PacMan3D\bin\Debug\04.HelloWorld.pdb
 D:\telerik\game\github\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
 D:\telerik\game\github\PacMan3D\obj\Debug\04.HelloWorld.exe
 D:\telerik\game\github\PacMan3D\obj\Debug\04.HelloWorld.pdb
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe.config
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.exe
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\Levels.txt
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
+E:\Ceco\Telerik\GitHub\TeamWork\Centaur\Forked\TeamCentaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
