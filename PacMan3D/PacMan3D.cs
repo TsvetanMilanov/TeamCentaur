@@ -55,11 +55,14 @@ class PacMan3DGame
         // set console size (screen resolution)
         Console.BufferHeight = Console.WindowHeight = 21;
         Console.BufferWidth = Console.WindowWidth = 40;
+        
+        StartupScreen();
 
         // labyrinth initializer
         int levelNumber = 0; //The number of the level which will be printed.
         int levelsCount = 4; //The count of all the levels in Levels.txt file.
         //2D string array which will contain all the levels.
+        Begin:
         string[,] allLevels = new string[levelsCount, playfieldWidth];
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
@@ -92,7 +95,6 @@ class PacMan3DGame
         }
        
 
-        StartupScreen();
 
         // Main game logic
         while (true)
@@ -116,18 +118,33 @@ class PacMan3DGame
 
             //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
             CheckForImpact();
-
+            //Go pass thru this ultra-mega-hyper-galactic portal
+            if (labyrinth[pacMan.x][pacMan.y] == '\u0040')
+            {
+                levelNumber++;
+                pacMan.x = playfieldWidth / 2;
+                pacMan.y = playfieldHeight / 2;
+                goto Begin;
+            }
+            if (labyrinth[pacMan.x][pacMan.y] == '\u0023')
+            {
+                levelNumber--;
+                pacMan.x = playfieldWidth / 2;
+                pacMan.y = playfieldHeight / 2;
+                goto Begin;
+            }
             //CheckForImpact gives true or false on isGameOver
             if (isGameOver)
             {
                 Console.Clear();
                 Console.WriteLine("Game Over");
+                ResultsFileTxt(); //darkyto added -set the results in a txt file at the end of the game
                 break;
             }
 
             PrintFrame();
             enemyEvenMoveCounter++;
-            Thread.Sleep(100);  // control game speed
+            Thread.Sleep(150);  // control game speed
         }
     }
         
@@ -143,7 +160,7 @@ class PacMan3DGame
         }
     }
 
-    private static void PrintFrame()
+    private static void PrintFrame() 
     {
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
@@ -154,6 +171,8 @@ class PacMan3DGame
         {
             PrintElement(enemies[i]);            
         }
+
+        PrintMenu(); // test 
     }
        
     private static void MovePacMan()
@@ -275,7 +294,12 @@ class PacMan3DGame
                 enemy[i].direction = "left";
                 enemy[i].lastDirection = "down";
             }
-
+            //checking for portal
+            if (enemy[i].direction == "down" && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u0040'))
+            {
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "down";
+            }
             if (enemy[i].direction == "down" && (labyrinth[enemy[i].x][enemy[i].y - 1] == '\u2588') && (labyrinth[enemy[i].x + 1][enemy[i].y] == '\u2588'))
             {
                 enemy[i].direction = "right";
@@ -404,7 +428,11 @@ class PacMan3DGame
                 enemy[i].direction = "right";
                 enemy[i].lastDirection = "up";
             }
-
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x-1][enemy[i].y] == '\u0023'))
+            {
+                enemy[i].direction = "right";
+                enemy[i].lastDirection = "up";
+            }
             if (enemy[i].direction == "up" && (labyrinth[enemy[i].x][enemy[i].y + 1] == '\u2588') && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u2588'))
             {
                 enemy[i].direction = "left";
@@ -556,7 +584,7 @@ class PacMan3DGame
         //Return the 2D string array with all levels.
         return levels;
     }
-    
+  
     static string[] selectLevel(string[,] allLevels, int levelNumber)
     {
         //Select the wanted level from the 2D array.
@@ -841,5 +869,355 @@ class PacMan3DGame
 
         Console.SetCursorPosition(Console.BufferWidth / 7, Console.BufferHeight - 5);
         Console.WriteLine("Press Esc to go back...");
+    }
+
+    static void PrintMenu() // this will print the in-game menu with results,lifes,levels, ect..  darkyto comments
+    {
+        
+        #region Draw borders
+        // top line border print
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.SetCursorPosition(20, 0);
+        StringBuilder topLine = new StringBuilder();
+        topLine.Append("  ");
+        topLine.Append("►►►►►►►►");
+        topLine.Append("↓");
+        topLine.Append("◄◄◄◄◄◄◄◄");
+        Console.WriteLine(topLine);
+
+
+        //bottom line border print
+        Console.SetCursorPosition(20, 19);
+        StringBuilder bottomLine = new StringBuilder();
+        bottomLine.Append("  ");
+        bottomLine.Append("►►►►►►►►");
+        bottomLine.Append("↑");
+        bottomLine.Append("◄◄◄◄◄◄◄◄");
+        Console.WriteLine(bottomLine);
+        #endregion
+
+        #region SOUND CONTROL (not so sure about it thou..) 
+        //Console.SetCursorPosition(20, 0);
+        //Console.Write("¸¸.•*¨*•♫♪");  // check this music for a game sound
+        #endregion
+
+        #region LifeCounter
+
+        int lifesCounter = 4; // hardcored for now - take the global for lifes remaining after it is ready
+
+        Console.BackgroundColor = ConsoleColor.DarkCyan;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.SetCursorPosition(23, 2);
+        StringBuilder lifeCountFrame = new StringBuilder();
+        lifeCountFrame.AppendLine("╔════════════╗");
+        Console.WriteLine(lifeCountFrame);
+
+        Console.SetCursorPosition(23, 3);
+        StringBuilder lifeCountFrame2 = new StringBuilder();
+        lifeCountFrame2.AppendLine(" Lifes ►      "); ;
+        Console.WriteLine(lifeCountFrame2);
+
+        Console.SetCursorPosition(23, 4);
+        StringBuilder lifeCountFrame3 = new StringBuilder();
+        lifeCountFrame3.AppendLine("╚════════════╝");
+        Console.WriteLine(lifeCountFrame3);
+        Console.ResetColor();
+
+
+        switch (lifesCounter)
+        {
+            case 1:
+                {
+                    Console.SetCursorPosition(31, 3);
+                    StringBuilder lifesLeft = new StringBuilder();
+                    lifesLeft.AppendLine(new string((char)9787, 1));
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(lifesLeft);
+                }
+                break;
+
+            case 2:
+                {
+                    Console.SetCursorPosition(31, 3);
+                    StringBuilder lifesLeft = new StringBuilder();
+                    lifesLeft.AppendLine(new string((char)9787, 2));
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(lifesLeft);
+                }
+                break;
+            case 3:
+                {
+                    Console.SetCursorPosition(31, 3);
+                    StringBuilder lifesLeft = new StringBuilder();
+                    lifesLeft.AppendLine(new string((char)9787, 3));
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(lifesLeft);
+                }
+                break;
+            case 4:
+                {
+                    Console.SetCursorPosition(31, 3);
+                    StringBuilder lifesLeft = new StringBuilder();
+                    lifesLeft.AppendLine(new string((char)9787, 4));
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(lifesLeft);
+                }
+                break;
+            case 5:
+                {
+                    Console.SetCursorPosition(31, 3);
+                    StringBuilder lifesLeft = new StringBuilder();
+                    lifesLeft.AppendLine(new string((char)9787, 5));
+                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(lifesLeft);
+                }
+                break;
+            default: break;
+        }
+        Console.ResetColor();
+        #endregion // Lifecounter
+
+        #region ScoreCounter
+
+        Console.BackgroundColor = ConsoleColor.DarkYellow;
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.SetCursorPosition(23, 6);
+        StringBuilder scoreCounterFrameTop = new StringBuilder();
+        scoreCounterFrameTop.AppendLine("╔════════════╗");
+        Console.WriteLine(scoreCounterFrameTop);
+        Console.SetCursorPosition(23, 7);
+        Console.WriteLine(" SCORE ►{0,5} ", 230); 
+        Console.SetCursorPosition(23, 8);
+        StringBuilder scoreCounterFrame = new StringBuilder();
+        scoreCounterFrame.AppendLine("╚════════════╝");
+        Console.WriteLine(scoreCounterFrame);
+        Console.ResetColor();
+
+
+
+        #endregion
+
+        #region LevelCounter
+
+        int levelNumber = 5; // hardcored for now - take the global for lifes remaining after it is ready
+        string textLevel = " LEVEL ";
+
+        Console.SetCursorPosition(23, 8);
+        switch (levelNumber)
+        {
+            case 1:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(23, 10);
+                    StringBuilder levelFrameTOp = new StringBuilder();
+                    levelFrameTOp.AppendLine("╔════════════╗");
+                    Console.WriteLine(levelFrameTOp);
+                    Console.SetCursorPosition(23, 11);
+                    Console.Write("{1}► {0,4} ", levelNumber, textLevel);
+
+                    Console.SetCursorPosition(23, 12);
+                    StringBuilder levelFrameBottom = new StringBuilder();
+                    levelFrameBottom.AppendLine("╚════════════╝");
+                    Console.WriteLine(levelFrameBottom);
+                    Console.ResetColor();
+                }
+                break;
+            case 2:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(23, 10);
+                    StringBuilder levelFrameTOp = new StringBuilder();
+                    levelFrameTOp.AppendLine("╔════════════╗");
+                    Console.WriteLine(levelFrameTOp);
+                    Console.SetCursorPosition(23, 11);
+                    Console.Write("{1}► {0,4} ", levelNumber, textLevel);
+
+                    Console.SetCursorPosition(23, 12);
+                    StringBuilder levelFrameBottom = new StringBuilder();
+                    levelFrameBottom.AppendLine("╚════════════╝");
+                    Console.WriteLine(levelFrameBottom);
+                    Console.ResetColor();
+                }
+                break;
+            case 3:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(23, 10);
+                    StringBuilder levelFrameTOp = new StringBuilder();
+                    levelFrameTOp.AppendLine("╔════════════╗");
+                    Console.WriteLine(levelFrameTOp);
+                    Console.SetCursorPosition(23, 11);
+                    Console.Write("{1}► {0,4} ", levelNumber, textLevel);
+
+                    Console.SetCursorPosition(23, 12);
+                    StringBuilder levelFrameBottom = new StringBuilder();
+                    levelFrameBottom.AppendLine("╚════════════╝");
+                    Console.WriteLine(levelFrameBottom);
+                    Console.ResetColor();
+                }
+                break;
+            case 4:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(23, 10);
+                    StringBuilder levelFrameTOp = new StringBuilder();
+                    levelFrameTOp.AppendLine("╔════════════╗");
+                    Console.WriteLine(levelFrameTOp);
+                    Console.SetCursorPosition(23, 11);
+                    Console.Write("{1}► {0,4} ", levelNumber, textLevel);
+
+                    Console.SetCursorPosition(23, 12);
+                    StringBuilder levelFrameBottom = new StringBuilder();
+                    levelFrameBottom.AppendLine("╚════════════╝");
+                    Console.WriteLine(levelFrameBottom);
+                    Console.ResetColor();
+                }
+                break;
+            case 5:
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.SetCursorPosition(23, 10);
+                    StringBuilder levelFrameTOp = new StringBuilder();
+                    levelFrameTOp.AppendLine("╔════════════╗");
+                    Console.WriteLine(levelFrameTOp);
+                    Console.SetCursorPosition(23, 11);
+                    Console.Write("{1}► {0,4} ", levelNumber, textLevel);
+
+                    Console.SetCursorPosition(23, 12);
+                    StringBuilder levelFrameBottom = new StringBuilder();
+                    levelFrameBottom.AppendLine("╚════════════╝");
+                    Console.WriteLine(levelFrameBottom);
+                    Console.ResetColor();
+                }
+                break;
+            default: break;
+        }
+        #endregion
+
+        #region codeToAdd
+
+
+        // exit(game over) screen?
+        string[] centaurPic ={
+                      @" |__
+   --==/////////////[})))==*
+                     |\ '          ,|
+                       `\`\      //|'                           ,|
+                         \ `\  //,/'                          -~ |
+         )           _-~~~\  |/ / |'                       _-~  /  ,
+        )(          /'  )  | \ / /'                     _-~   _/_-~|
+       (( )         ;  /`  ' )/ /''                 _ -~     _-~ ,/'
+       ) )(         `~~\   `\\/'/|'           __--~~__--\ _-~  _/,
+      ((___)          / ~~    \ /~      __--~~  --~~  __/~  _-~ /
+        | |          |    )   | '      /        __--~~  \-~~ _-~
+         \(\    __--(   _/    |'\     /     --~~   __--~' _-~ ~|
+         (  ((~~   __-~        \~\   /     ___---~~  ~~\~~__--~
+         `~~\~~~~~~   `\-~      \~\ /           __--~~~'~~/
+                       ;\ __--~  ~-/      ~~~~~__\__---~~.,,,
+                       ;;;;;;;;'  /      ---~~~/__-----_;;;;;;;;,,
+                      ;;;;;;;'   /      ----~~/          \ `;;;;;;;;;;;;,
+                      ;;;;'     (      ---~~/         `:::|  `;;;;;;;;;;;;;;.
+                      |'  _      `----~~~~'      /      `:|    ;;;;;;;'  `;;'
+                ______/\/~    |                 /        /       `;;;;;   `;
+              /~;;.____/;;'  /          ___----(   `;;;/          ;;;
+             / //  _;______;'------~~~~~    |;;/\    /           ;;
+            //  \ \                        / ,|  \;;,\            `
+           (<_    \ \                    /',/-----'  _>
+            \_|     \\_                 //~;~~~~~~~~~
+                     \_|               (,~~   -Tua Xiong
+                                        \~\
+                                         ~~"         
+                                     };
+        //for (int i = 0; i < centaurPic.Length; i++)               
+        //{
+        //    Console.SetCursorPosition(1, i + 1);
+        //    Console.BackgroundColor = ConsoleColor.DarkRed;
+        //    Console.ForegroundColor = ConsoleColor.White;
+        //    Console.Write(centaurPic[i]);
+        //    Console.ResetColor();
+        //}
+        #endregion
+
+        // Here is an additional intercativity to change the screen when Pacman ets a bonus , new level , ect .. needs a bool variable
+        #region PacMan Area
+
+        bool bonusTaken = false; // hardcored for now
+
+        if (bonusTaken)
+        {
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.SetCursorPosition(23, 14);
+            StringBuilder pacmanFrameTop = new StringBuilder();
+            Console.ForegroundColor = ConsoleColor.White;
+            pacmanFrameTop.AppendLine("╔════════════╗");
+            Console.WriteLine(pacmanFrameTop);
+            Console.SetCursorPosition(23, 15);
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("              ");
+            Console.SetCursorPosition(23, 16);
+            Console.WriteLine(" BONUS POINTS ");
+            Console.SetCursorPosition(23, 17);
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("              ");
+            Console.SetCursorPosition(23, 18);
+            StringBuilder pacmanFrameBottom = new StringBuilder();
+            Console.ForegroundColor = ConsoleColor.White;
+            pacmanFrameBottom.AppendLine("╚════════════╝");
+            Console.WriteLine(pacmanFrameBottom);
+            Console.ResetColor();
+        }
+        else
+        {
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.SetCursorPosition(22, 14);
+            StringBuilder pacmanFrameTop = new StringBuilder();
+            pacmanFrameTop.AppendLine("╔═══════════════╗");
+            Console.WriteLine(pacmanFrameTop);
+            Console.SetCursorPosition(22, 15);
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("                 ");
+            Console.SetCursorPosition(22, 16);
+            Console.WriteLine("►►► PACMAN 3D ◄◄◄");
+            Console.SetCursorPosition(22, 17);
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("                 ");
+            Console.SetCursorPosition(22, 18);
+            StringBuilder pacmanFrameBottom = new StringBuilder();
+            pacmanFrameBottom.AppendLine("╚═══════════════╝");
+            Console.WriteLine(pacmanFrameBottom);
+            Console.ResetColor();
+        }
+
+        #endregion 
+    }
+
+    // darkyto added - put the results in a txt file AFTER the end of the game
+    static void ResultsFileTxt() // hardocered needs global variables
+    {
+        StreamWriter streamWriter = new StreamWriter("../results.txt", append: true);
+        using (streamWriter)  //  ../about.html
+        {
+            int level = 1;// hardocered needs global variables
+            int score = 25;// hardocered needs global variables
+            DateTime date = DateTime.Now;
+            for (int number = 1; number <= 5; number++)
+            {
+                streamWriter.WriteLine("Hero result : {0,3} | Level reached : {1,2} | Date played : {2,10}", score, level, date);
+                score += score * 2; // hardocered needs global variables
+                level++;// hardocered needs global variables
+            }
+        }
     }
 }
