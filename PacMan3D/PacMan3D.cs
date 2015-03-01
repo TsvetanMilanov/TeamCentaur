@@ -15,7 +15,7 @@ struct Creature
     public string lastDirection;
 
     // constructor
-    public Creature(int x = 0, int y = 0, char skin = '?', ConsoleColor colour = ConsoleColor.Gray)
+    public Creature(int x=0, int y=0, char skin='?', ConsoleColor colour = ConsoleColor.Gray)
     {
         this.x = x;
         this.y = y;
@@ -49,24 +49,24 @@ class PacMan3DGame
     //Gold
     private static Creature gold = new Creature(1, 1, '$', ConsoleColor.Yellow);
     private static int score = 0;
-
+    
     static void Main()
     {
         // set console size (screen resolution)
         Console.BufferHeight = Console.WindowHeight = 21;
         Console.BufferWidth = Console.WindowWidth = 40;
-
+        
         StartupScreen();
 
         // labyrinth initializer
         int levelNumber = 0; //The number of the level which will be printed.
         int levelsCount = 4; //The count of all the levels in Levels.txt file.
-    //2D string array which will contain all the levels.
-    Begin:
+        //2D string array which will contain all the levels.
+        Begin:
         string[,] allLevels = new string[levelsCount, playfieldWidth];
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
-        labyrinth = SelectLevel(allLevels, levelNumber);
+        labyrinth = selectLevel(allLevels, levelNumber);
 
         // enemy initializer
         for (int i = 0; i < enemiesCount; i++)
@@ -93,7 +93,7 @@ class PacMan3DGame
                 enemies[i].direction = "down";
             }
         }
-
+       
 
 
         // Main game logic
@@ -104,7 +104,7 @@ class PacMan3DGame
 
             // Move the enemy per 2 steps
             if (enemyEvenMoveCounter % 2 == 0)
-            {
+            {                
                 MoveEnemies(enemies);
             }
 
@@ -147,7 +147,7 @@ class PacMan3DGame
             Thread.Sleep(150);  // control game speed
         }
     }
-
+        
     private static void CheckForImpact()
     {
         for (int i = 0; i < enemiesCount; i++)
@@ -160,7 +160,7 @@ class PacMan3DGame
         }
     }
 
-    private static void PrintFrame()
+    private static void PrintFrame() 
     {
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
@@ -169,17 +169,17 @@ class PacMan3DGame
         // print all enemies
         for (int i = 0; i < enemiesCount; i++)
         {
-            PrintElement(enemies[i]);
+            PrintElement(enemies[i]);            
         }
 
         PrintMenu(); // test 
     }
-
+       
     private static void MovePacMan()
     {
         while (Console.KeyAvailable)
         {
-
+            
             // we assign the pressed key value to a variable pressedKey
             ConsoleKeyInfo pressedKey = Console.ReadKey(true);
             // next we start checking the value of the pressed key and take action if neccessary
@@ -198,25 +198,25 @@ class PacMan3DGame
                     pacMan.y = pacMan.y + 1;
                 }
             }
-            else if (pressedKey.Key == ConsoleKey.UpArrow)
+            else if (pressedKey.Key == ConsoleKey.UpArrow )
             {
                 if (labyrinth[pacMan.x - 1][pacMan.y] != '\u2588')
                 {
                     pacMan.x = pacMan.x - 1;
                 }
             }
-            else if (pressedKey.Key == ConsoleKey.DownArrow)
+            else if (pressedKey.Key == ConsoleKey.DownArrow )
             {
                 if (labyrinth[pacMan.x + 1][pacMan.y] != '\u2588')
                 {
                     pacMan.x = pacMan.x + 1;
                 }
             }
-
+          
         }
-
+       
     }
-
+    
     private static void MoveEnemies(Creature[] enemy)
     {
         for (int i = 0; i < enemiesCount; i++)
@@ -428,7 +428,7 @@ class PacMan3DGame
                 enemy[i].direction = "right";
                 enemy[i].lastDirection = "up";
             }
-            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x - 1][enemy[i].y] == '\u0023'))
+            if (enemy[i].direction == "up" && (labyrinth[enemy[i].x-1][enemy[i].y] == '\u0023'))
             {
                 enemy[i].direction = "right";
                 enemy[i].lastDirection = "up";
@@ -514,85 +514,59 @@ class PacMan3DGame
     {
         //Read all the levels from the file.
 
+        //Create StreamReader for Levels.txt file.
+        StreamReader streamReader = new StreamReader(@"..\..\Levels.txt");
 
         //Create list for all levels.
         List<string[]> listOfLevels = new List<string[]>();
 
-        try
+        //String for the current line read from the file.
+        string currentLine = "";
+
+        //Array for the whole level, read from the file.
+        string[] currentLevel = new string[playfieldHeight];
+
+        int i = 0;
+        bool reachedEndOfFile = false;
+
+        while (true)
         {
-            //Create StreamReader for Levels.txt file.
-            using (StreamReader streamReader = new StreamReader(@"..\..\Levels.txt"))
+            //Read line from the file.
+            currentLine = streamReader.ReadLine();
+
+            //If the read line is equal to new line the ReadLine() will return "". This means we have finished reading the current level and it needs to be added to the list.
+            //If we have reached the end of the file we add the level to the list.
+            if ((currentLine == "" || currentLine == null) && reachedEndOfFile != true)
             {
-                //String for the current line read from the file.
-                string currentLine = "";
-
-                //Array for the whole level, read from the file.
-                string[] currentLevel = new string[playfieldHeight];
-
-                int i = 0;
-                bool reachedEndOfFile = false;
-
-                while (true)
+                listOfLevels.Add(currentLevel);
+                currentLevel = new string[playfieldHeight];
+                i = 0;
+            }
+            else
+            {
+                if (currentLine != null)
                 {
-                    //Read line from the file.
-                    currentLine = streamReader.ReadLine();
-
-                    //If the read line is equal to new line the ReadLine() will return "". This means we have finished reading the current level and it needs to be added to the list.
-                    //If we have reached the end of the file we add the level to the list.
-                    if ((currentLine == "" || currentLine == null) && reachedEndOfFile != true)
-                    {
-                        listOfLevels.Add(currentLevel);
-                        currentLevel = new string[playfieldHeight];
-                        i = 0;
-                    }
-                    else
-                    {
-                        if (currentLine != null)
-                        {
-                            //Add the current line to the currentLevel array.
-                            currentLevel[i] = (string)currentLine.Clone();
-                            i++;
-                        }
-                    }
-                    if (reachedEndOfFile)
-                    {
-                        //Break out of the cycle when we reach the end of the file and we have finished adding the levels to the list.
-                        break;
-                    }
-                    if (currentLine == null)
-                    {
-                        //Set the flag for end of file to true.
-                        reachedEndOfFile = true;
-                    }
+                    //Add the current line to the currentLevel array.
+                    currentLevel[i] = (string)currentLine.Clone();
+                    i++;
                 }
             }
-        }
-        catch (ArgumentNullException argumentNullException)
-        {
-            Console.WriteLine("An error occured when trying to read the levels from Levels.txt -> [{0}]", argumentNullException.Message);
-        }
-        catch (ArgumentException argumentException)
-        {
-            Console.WriteLine("An error occured when trying to read the levels from Levels.txt -> [{0}]", argumentException.Message);
-        }
-        catch (FileNotFoundException fileNotFoundException)
-        {
-            Console.WriteLine("An error occured when trying to read the levels from Levels.txt -> [{0}]", fileNotFoundException.Message);
-        }
-        catch (DirectoryNotFoundException directoryNotFoundException)
-        {
-            Console.WriteLine("An error occured when trying to read the levels from Levels.txt -> [{0}]", directoryNotFoundException.Message);
-        }
-        catch (IOException ioException)
-        {
-            Console.WriteLine("An error occured when trying to read the levels from Levels.txt -> [{0}]", ioException.Message);
-        }
-        catch (OutOfMemoryException outOfMemoryException)
-        {
-            Console.WriteLine("An error occured when trying to read the levels from Levels.txt -> [{0}]", outOfMemoryException.Message);
+            if (reachedEndOfFile)
+            {
+                //Break out of the cycle when we reach the end of the file and we have finished adding the levels to the list.
+                break;
+            }
+            if (currentLine == null)
+            {
+                //Set the flag for end of file to true.
+                reachedEndOfFile = true;
+            }
+
+
         }
 
         int count = listOfLevels.Count;
+        
 
         //String array for all the levels.
         string[,] levels = new string[count, playfieldWidth];
@@ -602,7 +576,7 @@ class PacMan3DGame
         {
             for (int k = 0; k < playfieldWidth; k++)
             {
-
+                
                 levels[j, k] = listOfLevels[j][k];
             }
         }
@@ -610,8 +584,8 @@ class PacMan3DGame
         //Return the 2D string array with all levels.
         return levels;
     }
-
-    static string[] SelectLevel(string[,] allLevels, int levelNumber)
+  
+    static string[] selectLevel(string[,] allLevels, int levelNumber)
     {
         //Select the wanted level from the 2D array.
 
@@ -633,7 +607,7 @@ class PacMan3DGame
         //Return string array with the selected level.
         return selectedLevel;
     }
-
+    
     static void PrintElement(Creature thisObject)
     {
         // print object of type Element
@@ -673,7 +647,7 @@ class PacMan3DGame
         }
 
         PrintSmileyArray(smileyFace); //Printing border (smileyface array) and Pac Man "Logo"
-        PrintPacManLogo();
+        PrintPacManLogo(); 
 
         int cursorPositionX = Console.BufferWidth / 7; //Set print positions for menu options ("New Game" and "Read Instructions")
         int cursorPositionY = Console.BufferHeight - 5;
@@ -730,7 +704,7 @@ class PacMan3DGame
                         Console.Clear();
 
                         PrintSmileyArray(smileyFace);
-
+                        
                         Console.ForegroundColor = ConsoleColor.Gray;
                         PrintPacManLogo();
 
@@ -749,10 +723,10 @@ class PacMan3DGame
                 if (pressedKeyValue == 1 && key == ConsoleKey.Enter) //">>" will be at "Read Instructions" and after
                 {                                                    //presing {Enter} Instructions submenu will appear.
                     Console.Beep();
-                    Console.Clear();
+                    Console.Clear();                                                       
                     PrintSmileyArray(smileyFace);
                     PrintInstructions();
-
+                    
                     if (key == ConsoleKey.Escape) //Goes back to main start menu
                     {
                         pressedKeyValue = 0;
@@ -760,7 +734,7 @@ class PacMan3DGame
                 }
             }
         }
-
+        
     }
 
     static void PrintSmileyArray(char[,] smileyFace)
@@ -820,12 +794,12 @@ class PacMan3DGame
                       "\u2588   \u2588",
                       "\u2588\u2588\u2588"
                      };
-
+        
         for (int i = 0; i < P.Length; i++)
-        {
-            Console.SetCursorPosition(4, i + 4);
-            Console.Write(P[i]);
-        }
+			{
+              Console.SetCursorPosition(4, i + 4);
+			  Console.Write(P[i]);
+			}
 
         Console.SetCursorPosition(9, 7);
         for (int i = 0; i < P.Length; i++)
@@ -885,7 +859,7 @@ class PacMan3DGame
         Console.SetCursorPosition(1, 6);
         Console.WriteLine("pieces and earning points. Once the");
         Console.SetCursorPosition(1, 7);
-        Console.WriteLine("player has collected a certain amount");
+        Console.WriteLine("player has collected a certain amount"); 
         Console.SetCursorPosition(1, 8);
         Console.WriteLine("of points, a secret portal opens to");
         Console.SetCursorPosition(1, 9);
@@ -899,7 +873,7 @@ class PacMan3DGame
 
     static void PrintMenu() // this will print the in-game menu with results,lifes,levels, ect..  darkyto comments
     {
-
+        
         #region Draw borders
         // top line border print
         Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -922,7 +896,7 @@ class PacMan3DGame
         Console.WriteLine(bottomLine);
         #endregion
 
-        #region SOUND CONTROL (not so sure about it thou..)
+        #region SOUND CONTROL (not so sure about it thou..) 
         //Console.SetCursorPosition(20, 0);
         //Console.Write("¸¸.•*¨*•♫♪");  // check this music for a game sound
         #endregion
@@ -1017,7 +991,7 @@ class PacMan3DGame
         scoreCounterFrameTop.AppendLine("╔════════════╗");
         Console.WriteLine(scoreCounterFrameTop);
         Console.SetCursorPosition(23, 7);
-        Console.WriteLine(" SCORE ►{0,5} ", 230);
+        Console.WriteLine(" SCORE ►{0,5} ", 230); 
         Console.SetCursorPosition(23, 8);
         StringBuilder scoreCounterFrame = new StringBuilder();
         scoreCounterFrame.AppendLine("╚════════════╝");
@@ -1226,7 +1200,7 @@ class PacMan3DGame
             Console.ResetColor();
         }
 
-        #endregion
+        #endregion 
     }
 
     // darkyto added - put the results in a txt file AFTER the end of the game
