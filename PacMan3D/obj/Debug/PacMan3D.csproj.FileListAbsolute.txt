@@ -4,6 +4,7 @@ D:\TELERIK\teamProject\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.exe
 D:\TELERIK\teamProject\TeamCentaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
 D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.exe
 D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
+D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
 D:\telerik\game\github\PacMan3D\bin\Debug\Levels.txt
 D:\telerik\game\github\PacMan3D\bin\Debug\04.HelloWorld.exe.config
 D:\telerik\game\github\PacMan3D\bin\Debug\04.HelloWorld.exe
@@ -11,4 +12,13 @@ D:\telerik\game\github\PacMan3D\bin\Debug\04.HelloWorld.pdb
 D:\telerik\game\github\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
 D:\telerik\game\github\PacMan3D\obj\Debug\04.HelloWorld.exe
 D:\telerik\game\github\PacMan3D\obj\Debug\04.HelloWorld.pdb
-D:\TELERIK\teamProject\TeamCentaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\bin\Debug\04.HelloWorld.exe.config
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\obj\Debug\04.HelloWorld.exe
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\bin\Debug\Levels.txt
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\bin\Debug\04.HelloWorld.exe
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\bin\Debug\04.HelloWorld.pdb
+C:\Users\Akila\Desktop\Team Centaur\PacMan3D\obj\Debug\PacMan3D.csprojResolveAssemblyReference.cache
+D:\todor\work\Telerik\C#\part2\Team Centaur\PacMan3D\bin\Debug\04.HelloWorld.exe.config
+D:\todor\work\Telerik\C#\part2\Team Centaur\PacMan3D\obj\Debug\04.HelloWorld.exe
+D:\todor\work\Telerik\C#\part2\Team Centaur\PacMan3D\obj\Debug\04.HelloWorld.pdb
