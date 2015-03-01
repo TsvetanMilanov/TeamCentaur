@@ -34,11 +34,14 @@ class PacMan3DGame
 
     private static Creature pacMan = new Creature(playfieldHeight / 2, playfieldWidth / 2, (char)9787, ConsoleColor.Yellow);
 
-    private static int enemiesCount = 6;
+    private static int enemiesCount = 3;
 
     private static Creature[] enemies = new Creature[enemiesCount];
 
     private static string[] labyrinth;
+    private static string[,] allLevels = new string[levelsCount, playfieldWidth];
+    private static int levelNumber = 0; //The number of the level which will be printed.
+    private static int levelsCount = 4; //The count of all the levels in Levels.txt file.
 
     // Check if the game is over variable
     private static bool isGameOver = false;
@@ -46,15 +49,13 @@ class PacMan3DGame
     // Enemy Even move counter
     private static long enemyEvenMoveCounter = 1;
     private static Random randomizer = new Random();
-    //Gold
-    private static Creature gold = new Creature(1, 1, '$', ConsoleColor.Yellow);
-    private static Creature goldTwo = new Creature(18, 1, '$', ConsoleColor.Green);
-    private static Creature goldThree = new Creature(1, 18, '$', ConsoleColor.Blue);
-    private static Creature goldBonus = new Creature(18, 18, '♫', ConsoleColor.Cyan);
+
+    // Scoring and bonuses
+    private static char[, ,] gold = new char[levelsCount, playfieldHeight, playfieldWidth];
+    private static int goldCount;
     private static int score = 0;
-    private static int levelNumber = 0; //The number of the level which will be printed.
-    private static int levelsCount = 4; //The count of all the levels in Levels.txt file.
-    private static int tempScore = 0; // this is variable used in PrintMenu - for the bonus screen after pacman eats a $
+    private static int tempScore = 0;
+    
     private static string heroName = "";
 
     static void Main()
@@ -68,8 +69,7 @@ class PacMan3DGame
         // labyrinth initializer
 
         //2D string array which will contain all the levels.
-    Begin:
-        string[,] allLevels = new string[levelsCount, playfieldWidth];
+        
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
         labyrinth = selectLevel(allLevels, levelNumber);
@@ -100,12 +100,25 @@ class PacMan3DGame
             }
         }
 
+        // gold initializer
+        goldCount = randomizer.Next(10, 30);
+        int counter = goldCount;
+        while (counter!=0)
+        {
+            int goldRow = randomizer.Next(1, playfieldHeight - 2);
+            int goldCol = randomizer.Next(1, playfieldWidth - 2);
+            int goldLevel = randomizer.Next(0, levelsCount);
+
+            if (allLevels[goldLevel,goldRow][goldCol] == ' ')
+            {
+                gold[goldLevel, goldRow, goldCol] = '$';
+                counter--;
+            }
+        }
+
         // Main game logic
         while (true)
         {
-            //The array labyrinth is equal to the current level we select.
-            //labyrinth = selectLevel(allLevels, levelNumber);
-
             // Move the enemy per 2 steps
             if (enemyEvenMoveCounter % 2 == 0)
             {
@@ -113,128 +126,16 @@ class PacMan3DGame
             }
 
             // detect pacman movement every frame redraw
-            MovePacMan();
-            if ((pacMan.x == gold.x) && (pacMan.y == gold.y) && gold.skin == '$')
-            {
-                gold.skin = ' ';
-                score += 5; // + 5 points per each bonus
-            }
-            else if ((pacMan.x == goldTwo.x) && (pacMan.y == goldTwo.y) && goldTwo.skin == '$')
-            {
-                goldTwo.skin = ' ';
-                score += 20; // + 20 points per each bonus
-            }
-            else if ((pacMan.x == goldThree.x) && (pacMan.y == goldThree.y) && goldThree.skin == '$')
-            {
-                goldThree.skin = ' ';
-                score += 50; // +  50 points per each bonus
-            }
-            else if ((pacMan.x == goldBonus.x) && (pacMan.y == goldBonus.y) && goldBonus.skin == '♫')
-            {
-                goldBonus.skin = ' ';
-                score *= 3; // Bonus muplitplies the current score * 3
-            }
+            MovePacMan();            
 
             //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
             CheckForImpact();
-            //Go pass thru this ultra-mega-hyper-galactic portal
-            if (labyrinth[pacMan.x][pacMan.y] == '\u0040')
-            {
-                Random rand = new Random();
-                // int min = 2;
-                int max = 18;
-                gold.y = rand.Next(max);
-                gold.x = 1;// this is hardcored because on most level x=1 is clear 
-                goldTwo.y = rand.Next(max);
-                goldTwo.x = 18;// this is hardcored because on most level x=18 is clear
-                goldThree.y = rand.Next(max);
-                goldThree.x = 5;// this is hardcored because on most level x=18 is clear
-                goldBonus.y = rand.Next(max);
-                goldBonus.x = 11;// this is hardcored because on most level x=18 is clear
-
-                levelNumber++;
-                pacMan.x = playfieldWidth / 2;
-                pacMan.y = playfieldHeight / 2;
-                goto Begin;
-            }
-            if (labyrinth[pacMan.x][pacMan.y] == '\u0023')
-            {
-                Random rand = new Random();
-                // int min = 2;
-                int max = 18;
-                gold.y = rand.Next(max);
-                gold.x = 1; // this is hardcored because on most level x=1 is clear 
-                goldTwo.y = rand.Next(max);
-                goldTwo.x = 18; // this is hardcored because on most level x=18 is clear 
-                goldThree.y = rand.Next(max);
-                goldThree.x = 5;// this is hardcored because on most level x=18 is clear
-                goldBonus.y = rand.Next(max);
-                goldBonus.x = 11;// this is hardcored because on most level x=18 is clear
-
-                levelNumber--;
-                pacMan.x = playfieldWidth / 2;
-                pacMan.y = playfieldHeight / 2;
-                goto Begin;
-            }
+            
             //CheckForImpact gives true or false on isGameOver
             if (isGameOver)
             {
-                Console.Clear();
-
-                char[,] smileyFace = new char[Console.BufferHeight, Console.BufferWidth];
-                for (int col = 0; col < smileyFace.GetLength(1); col++)
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    smileyFace[Console.BufferHeight - 1, col] = (char)9787;
-                    smileyFace[1, col] = (char)9787;
-                }
-                for (int row = 0; row < smileyFace.GetLength(0); row++)
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    smileyFace[row, 0] = (char)9787;
-                    smileyFace[row, Console.BufferWidth - 1] = (char)9787;
-                }
-
-                PrintSmileyArray(smileyFace);
-                PrintPacManLogo();
-
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine("☻ ◄◄◄    GAME OVER     ►►►");
-                Console.Write("☻ ◄◄◄ EMTER YOUR NAME  ►►►   ");
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Red;
-                heroName = Console.ReadLine();
-                Console.ResetColor();
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("☻ ◄◄◄ {0,6}'s results ►►►     ", heroName); // 
-                Console.Write("☻ ◄◄◄ Your hero earned ►►► ");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("{0,3} Points  ", score);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("☻ ◄◄◄ Level reached    ►►► ", levelNumber + 1);
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("{0,3} Level   ", levelNumber + 1);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("☻");
-                Console.ResetColor();
-
-                ResultsFileTxt(); // set the results in a txt file at the end of the game
-
+                GameOver();
                 break;
-                //Console.WriteLine("Press ENTER for New Game || press Any key to Exit");
-                //ConsoleKeyInfo pressedKey = Console.ReadKey(true);
-                //if (pressedKey.Key == ConsoleKey.Enter)
-                //{
-                //    goto NewGame;  // if someone can make this happen...
-                //}
-                //else
-                //{
-                //    break;
-                //}
             }
 
             PrintFrame();
@@ -269,31 +170,118 @@ class PacMan3DGame
         }
     }
 
+    private static void GameOver()
+    {
+        Console.Clear();
+
+        char[,] smileyFace = new char[Console.BufferHeight, Console.BufferWidth];
+        for (int col = 0; col < smileyFace.GetLength(1); col++)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            smileyFace[Console.BufferHeight - 1, col] = (char)9787;
+            smileyFace[1, col] = (char)9787;
+        }
+        for (int row = 0; row < smileyFace.GetLength(0); row++)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            smileyFace[row, 0] = (char)9787;
+            smileyFace[row, Console.BufferWidth - 1] = (char)9787;
+        }
+
+        PrintSmileyArray(smileyFace);
+        PrintPacManLogo();
+
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("☻ ◄◄◄    GAME OVER     ►►►");
+        Console.Write("☻ ◄◄◄ EMTER YOUR NAME  ►►►   ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Red;
+        heroName = Console.ReadLine();
+        Console.ResetColor();
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("☻ ◄◄◄ {0,6}'s results ►►►     ", heroName); // 
+        Console.Write("☻ ◄◄◄ Your hero earned ►►► ");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("{0,3} Points  ", score);
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write("☻ ◄◄◄ Level reached    ►►► ", levelNumber + 1);
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write("{0,3} Level   ", levelNumber + 1);
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("☻");
+        Console.ResetColor();
+
+        ResultsFileTxt(); // set the results in a txt file at the end of the game
+    }
+
     private static void CheckForImpact()
     {
+        // check for enemy impact
         for (int i = 0; i < enemiesCount; i++)
         {
-            if (enemies[i].y == pacMan.y && enemies[i].x == pacMan.x)
+            if ( (enemies[i].y == pacMan.y && enemies[i].x == pacMan.x) || goldCount == 0)
             {
-                Console.WriteLine("Game Over !");
+                //Console.WriteLine("Game Over !");
                 isGameOver = true;
             }
         }
+
+        // check for portals
+        if (labyrinth[pacMan.x][pacMan.y] == '\u0040')
+        {
+            levelNumber++;
+            pacMan.x -= playfieldWidth-2;
+            pacMan.y -= 12;
+            //The array labyrinth is equal to the current level we select.
+            labyrinth = selectLevel(allLevels, levelNumber);
+        }
+
+        if (labyrinth[pacMan.x][pacMan.y] == '\u0023')
+        {
+            levelNumber--;
+            pacMan.x += playfieldWidth - 2;
+            pacMan.y += 12;
+            //The array labyrinth is equal to the current level we select.
+            labyrinth = selectLevel(allLevels, levelNumber);
+        }
+
+        // check for gold and bonuses
+        if (gold[levelNumber, pacMan.x, pacMan.y ] == '$')
+        {
+            gold[levelNumber, pacMan.x, pacMan.y] = ' ';
+            score += 5; // + 5 points per each bonus
+            goldCount--;
+        }        
     }
 
     private static void PrintFrame()
     {
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
-        PrintElement(gold);
-        PrintElement(goldTwo);
-        PrintElement(goldThree);
-        PrintElement(goldBonus);
+        //PrintElement(gold);
+        
         PrintElement(pacMan);
         // print all enemies
         for (int i = 0; i < enemiesCount; i++)
         {
             PrintElement(enemies[i]);
+        }
+
+        for (int i = 0; i < playfieldHeight; i++)
+        {
+            for (int j = 0; j < playfieldWidth; j++)
+            {
+                if (gold[levelNumber,i,j]=='$')
+                {
+                    Console.SetCursorPosition(j, i);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("$");
+                }
+            }
         }
 
         PrintMenu(); // test 
@@ -1288,16 +1276,16 @@ class PacMan3DGame
     // put the results in a txt file AFTER the end of the game
     static void ResultsFileTxt() // hardocered needs global variables
     {
-        StreamWriter streamWriter = new StreamWriter("../results.txt", append: true);
+        StreamWriter streamWriter = new StreamWriter(@"..\..\results.txt", append: true);
         using (streamWriter)  //  ../about.html
         {
             int level = levelNumber+1;// hardocered needs global variables
             int scoreFile = score;// hardocered needs global variables
             DateTime date = DateTime.Now;
-            for (int number = 1; number <= 5; number++)
-            {
+            //for (int number = 1; number <= 5; number++)
+            //{
                 streamWriter.WriteLine("{3}'s result : {0,3} |\n Level reached : {1,2} |\n Date played : {2,10}", scoreFile, level, date, heroName);
-            }
+            //}
         }
     }
 }
