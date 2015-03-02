@@ -29,49 +29,47 @@ struct Creature
 
 class PacMan3DGame
 {
-    // Global variables
-    private const int playfieldHeight = 20;
-    private const int playfieldWidth = 20;
+#region Global variables
 
-    private static Creature pacMan = new Creature(playfieldHeight / 2, playfieldWidth / 2, (char)9787, ConsoleColor.Yellow);
+    const int playfieldHeight = 20;
+    const int playfieldWidth = 20;
 
-    private static int enemiesCount = 6;
+    static Creature pacMan = new Creature(playfieldHeight / 2, playfieldWidth / 2, (char)9787, ConsoleColor.Yellow);
 
-    private static Creature[] enemies = new Creature[enemiesCount];
+    // enemies
+    const int enemiesCount = 6;
+    static Creature[] enemies = new Creature[enemiesCount];
+    static long enemyEvenMoveCounter = 1;
+    static Random randomizer = new Random();
 
-    private static string[] labyrinth;
-    private static string[,] allLevels = new string[levelsCount, playfieldWidth];
-    private static int levelNumber = 0; //The number of the level which will be printed.
-    private static int levelsCount = 4; //The count of all the levels in Levels.txt file.
+    // labyrinths
+    static string[] labyrinth;
+    static string[,] allLevels = new string[levelsCount, playfieldWidth];
+    static int levelNumber = 0;
+    static int levelsCount = 4; 
 
-    // Check if the game is over variable
-    private static bool isGameOver = false;
+    static bool isGameOver = false;
 
-    // Enemy Even move counter
-    private static long enemyEvenMoveCounter = 1;
-    private static Random randomizer = new Random();
+    // scoring
+    static char[, ,] gold = new char[levelsCount, playfieldHeight, playfieldWidth];
+    static int goldCount;
+    static int score = 0;
+    static int tempScore = 0;    
+    static string heroName = "";
 
-    // Scoring and bonuses
-    private static char[, ,] gold = new char[levelsCount, playfieldHeight, playfieldWidth];
-    private static int goldCount;
-    private static int score = 0;
-    private static int tempScore = 0;
-
-    private static string heroName = "";
+#endregion
 
     static void Main()
     {
-        // set console size (screen resolution)
-        Console.BufferHeight = Console.WindowHeight = 21;
-        Console.BufferWidth = Console.WindowWidth = 40;
-
         StartupScreen();
 
-        // labyrinth initializer
+        #region Initialization
 
-        //2D string array which will contain all the levels.
+        // set screen size
+        Console.BufferHeight = Console.WindowHeight = playfieldHeight + 1;
+        Console.BufferWidth = Console.WindowWidth = playfieldWidth + 20;
 
-        //Read all the levels from the file useing ReadLevelsFromFile().
+        // load levels
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
         labyrinth = selectLevel(allLevels, levelNumber);
 
@@ -82,7 +80,8 @@ class PacMan3DGame
             int y = (playfieldWidth - 3) / randomizer.Next(1, 5);
             enemies[i] = new Creature(x, y, '\u2666', ConsoleColor.Red);
 
-            int enemyStartDirection = randomizer.Next(1, 5); // randomizining enemy start direction
+            // AI initializer
+            int enemyStartDirection = randomizer.Next(1, 5);
             if (enemyStartDirection == 1)
             {
                 enemies[i].direction = "right";
@@ -117,61 +116,38 @@ class PacMan3DGame
             }
         }
 
-        // Main game logic
+        #endregion
+
+        #region GameLoop
+
         while (true)
         {
-            // Move the enemy per 2 steps
-            if (enemyEvenMoveCounter % 2 == 0)
-            {
-                MoveEnemies(enemies);
-            }
+            RenderEngine();
 
-            // detect pacman movement every frame redraw
-            MovePacMan();
+            PhysicsEngine();
 
-            //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
-            CheckForImpact();
-
-            //CheckForImpact gives true or false on isGameOver
             if (isGameOver)
-            {
-                GameOver();
-                break;
-            }
-
-            PrintFrame();
-            enemyEvenMoveCounter++;
-
-            if (levelNumber == 0) // added faster speed for each new level
-            {
-                Thread.Sleep(150);  // control game speed
-            }
-            else if (levelNumber == 1)
-            {
-                Thread.Sleep(140);
-            }
-            else if (levelNumber == 2)
-            {
-                Thread.Sleep(130);
-            }
-            else if (levelNumber == 3)
-            {
-                Thread.Sleep(110);
-            }
-            else if (levelNumber == 4)
-            {
-                Thread.Sleep(90);
-            }
-            else
-            {
-                Thread.Sleep(150); //default case
-            }
-
-
+                break;            
         }
+               
+        #endregion
+
+        EndScreen();
     }
 
-    private static void GameOver()
+    private static void PhysicsEngine()
+    {
+        if (enemyEvenMoveCounter % 2 == 0)
+        {
+            MoveEnemies(enemies);
+        }
+
+        MovePacMan();
+
+        CheckForImpact();
+    }
+
+    static void EndScreen()
     {
         Console.Clear();
 
@@ -219,7 +195,7 @@ class PacMan3DGame
         ResultsFileTxt(); // set the results in a txt file at the end of the game
     }
 
-    private static void CheckForImpact()
+    static void CheckForImpact()
     {
         // check for enemy impact
         for (int i = 0; i < enemiesCount; i++)
@@ -230,6 +206,8 @@ class PacMan3DGame
                 isGameOver = true;
             }
         }
+
+        enemyEvenMoveCounter++;
 
         // check for portals
         if (labyrinth[pacMan.x][pacMan.y] == '\u0040')
@@ -259,19 +237,20 @@ class PacMan3DGame
         }
     }
 
-    private static void PrintFrame()
+    static void RenderEngine()
     {
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
-        //PrintElement(gold);
 
         PrintElement(pacMan);
+
         // print all enemies
         for (int i = 0; i < enemiesCount; i++)
         {
             PrintElement(enemies[i]);
         }
 
+        // print gold
         for (int i = 0; i < playfieldHeight; i++)
         {
             for (int j = 0; j < playfieldWidth; j++)
@@ -285,10 +264,37 @@ class PacMan3DGame
             }
         }
 
-        PrintMenu(); // test 
+        PrintMenu();
+
+        #region Framerate control
+        if (levelNumber == 0)
+        {
+            Thread.Sleep(150);
+        }
+        else if (levelNumber == 1)
+        {
+            Thread.Sleep(140);
+        }
+        else if (levelNumber == 2)
+        {
+            Thread.Sleep(130);
+        }
+        else if (levelNumber == 3)
+        {
+            Thread.Sleep(110);
+        }
+        else if (levelNumber == 4)
+        {
+            Thread.Sleep(90);
+        }
+        else
+        {
+            Thread.Sleep(150); //default case
+        }
+        #endregion
     }
 
-    private static void MovePacMan()
+    static void MovePacMan()
     {
         while (Console.KeyAvailable)
         {
@@ -330,7 +336,7 @@ class PacMan3DGame
 
     }
 
-    private static void MoveEnemies(Creature[] enemy)
+    static void MoveEnemies(Creature[] enemy)
     {
         for (int i = 0; i < enemiesCount; i++)
         {
@@ -1021,7 +1027,7 @@ class PacMan3DGame
         Console.WriteLine("Press Esc to go back...");
     }
 
-    static void PrintMenu() // this will print the in-game menu with results,lifes,levels, ect..  darkyto comments
+    static void PrintMenu()
     {
 
         #region Draw borders
@@ -1310,8 +1316,7 @@ class PacMan3DGame
         #endregion
     }
 
-    // put the results in a txt file AFTER the end of the game
-    static void ResultsFileTxt() // hardocered needs global variables
+    static void ResultsFileTxt()
     {
         try
         {
@@ -1323,7 +1328,7 @@ class PacMan3DGame
                 DateTime date = DateTime.Now;
                 //for (int number = 1; number <= 5; number++)
                 //{
-                streamWriter.WriteLine("{3}'s result : {0,3} |\n Level reached : {1,2} |\n Date played : {2,10}", scoreFile, level, date, heroName);
+                streamWriter.WriteLine("{3}'s result : {0,3} | Level reached : {1,2} | Date played : {2,10}", scoreFile, level, date, heroName);
                 //}
             }
         }
