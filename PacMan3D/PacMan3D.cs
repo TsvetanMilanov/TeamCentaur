@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.IO;
+using System.Security;
 
 struct Creature
 {
@@ -34,7 +35,7 @@ class PacMan3DGame
 
     private static Creature pacMan = new Creature(playfieldHeight / 2, playfieldWidth / 2, (char)9787, ConsoleColor.Yellow);
 
-    private static int enemiesCount = 3;
+    private static int enemiesCount = 6;
 
     private static Creature[] enemies = new Creature[enemiesCount];
 
@@ -55,7 +56,7 @@ class PacMan3DGame
     private static int goldCount;
     private static int score = 0;
     private static int tempScore = 0;
-    
+
     private static string heroName = "";
 
     static void Main()
@@ -69,7 +70,7 @@ class PacMan3DGame
         // labyrinth initializer
 
         //2D string array which will contain all the levels.
-        
+
         //Read all the levels from the file useing ReadLevelsFromFile().
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
         labyrinth = selectLevel(allLevels, levelNumber);
@@ -103,13 +104,13 @@ class PacMan3DGame
         // gold initializer
         goldCount = randomizer.Next(10, 30);
         int counter = goldCount;
-        while (counter!=0)
+        while (counter != 0)
         {
             int goldRow = randomizer.Next(1, playfieldHeight - 2);
             int goldCol = randomizer.Next(1, playfieldWidth - 2);
             int goldLevel = randomizer.Next(0, levelsCount);
 
-            if (allLevels[goldLevel,goldRow][goldCol] == ' ')
+            if (allLevels[goldLevel, goldRow][goldCol] == ' ')
             {
                 gold[goldLevel, goldRow, goldCol] = '$';
                 counter--;
@@ -126,11 +127,11 @@ class PacMan3DGame
             }
 
             // detect pacman movement every frame redraw
-            MovePacMan();            
+            MovePacMan();
 
             //Checking for impact when you add enemy you must add the enemy in this method (CheckForImpact())
             CheckForImpact();
-            
+
             //CheckForImpact gives true or false on isGameOver
             if (isGameOver)
             {
@@ -223,7 +224,7 @@ class PacMan3DGame
         // check for enemy impact
         for (int i = 0; i < enemiesCount; i++)
         {
-            if ( (enemies[i].y == pacMan.y && enemies[i].x == pacMan.x) || goldCount == 0)
+            if ((enemies[i].y == pacMan.y && enemies[i].x == pacMan.x) || goldCount == 0)
             {
                 //Console.WriteLine("Game Over !");
                 isGameOver = true;
@@ -234,7 +235,7 @@ class PacMan3DGame
         if (labyrinth[pacMan.x][pacMan.y] == '\u0040')
         {
             levelNumber++;
-            pacMan.x -= playfieldWidth-2;
+            pacMan.x -= playfieldWidth - 2;
             pacMan.y -= 12;
             //The array labyrinth is equal to the current level we select.
             labyrinth = selectLevel(allLevels, levelNumber);
@@ -250,12 +251,12 @@ class PacMan3DGame
         }
 
         // check for gold and bonuses
-        if (gold[levelNumber, pacMan.x, pacMan.y ] == '$')
+        if (gold[levelNumber, pacMan.x, pacMan.y] == '$')
         {
             gold[levelNumber, pacMan.x, pacMan.y] = ' ';
             score += 5; // + 5 points per each bonus
             goldCount--;
-        }        
+        }
     }
 
     private static void PrintFrame()
@@ -263,7 +264,7 @@ class PacMan3DGame
         Console.Clear();    // fast screen clear
         PrintLabyrinth(labyrinth);
         //PrintElement(gold);
-        
+
         PrintElement(pacMan);
         // print all enemies
         for (int i = 0; i < enemiesCount; i++)
@@ -275,7 +276,7 @@ class PacMan3DGame
         {
             for (int j = 0; j < playfieldWidth; j++)
             {
-                if (gold[levelNumber,i,j]=='$')
+                if (gold[levelNumber, i, j] == '$')
                 {
                     Console.SetCursorPosition(j, i);
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -627,59 +628,87 @@ class PacMan3DGame
     {
         //Read all the levels from the file.
 
-        //Create StreamReader for Levels.txt file.
-        StreamReader streamReader = new StreamReader(@"..\..\Levels.txt");
 
         //Create list for all levels.
         List<string[]> listOfLevels = new List<string[]>();
 
-        //String for the current line read from the file.
-        string currentLine = "";
-
-        //Array for the whole level, read from the file.
-        string[] currentLevel = new string[playfieldHeight];
-
-        int i = 0;
-        bool reachedEndOfFile = false;
-
-        while (true)
+        try
         {
-            //Read line from the file.
-            currentLine = streamReader.ReadLine();
+            //Create StreamReader for Levels.txt file.
+            using (StreamReader streamReader = new StreamReader(@"..\..\Levels.txt"))
+            {
+                //String for the current line read from the file.
+                string currentLine = "";
 
-            //If the read line is equal to new line the ReadLine() will return "". This means we have finished reading the current level and it needs to be added to the list.
-            //If we have reached the end of the file we add the level to the list.
-            if ((currentLine == "" || currentLine == null) && reachedEndOfFile != true)
-            {
-                listOfLevels.Add(currentLevel);
-                currentLevel = new string[playfieldHeight];
-                i = 0;
-            }
-            else
-            {
-                if (currentLine != null)
+                //Array for the whole level, read from the file.
+                string[] currentLevel = new string[playfieldHeight];
+
+                int i = 0;
+                bool reachedEndOfFile = false;
+
+                while (true)
                 {
-                    //Add the current line to the currentLevel array.
-                    currentLevel[i] = (string)currentLine.Clone();
-                    i++;
+                    //Read line from the file.
+                    currentLine = streamReader.ReadLine();
+
+                    //If the read line is equal to new line the ReadLine() will return "". This means we have finished reading the current level and it needs to be added to the list.
+                    //If we have reached the end of the file we add the level to the list.
+                    if ((currentLine == "" || currentLine == null) && reachedEndOfFile != true)
+                    {
+                        listOfLevels.Add(currentLevel);
+                        currentLevel = new string[playfieldHeight];
+                        i = 0;
+                    }
+                    else
+                    {
+                        if (currentLine != null)
+                        {
+                            //Add the current line to the currentLevel array.
+                            currentLevel[i] = (string)currentLine.Clone();
+                            i++;
+                        }
+                    }
+                    if (reachedEndOfFile)
+                    {
+                        //Break out of the cycle when we reach the end of the file and we have finished adding the levels to the list.
+                        break;
+                    }
+                    if (currentLine == null)
+                    {
+                        //Set the flag for end of file to true.
+                        reachedEndOfFile = true;
+                    }
+
+
                 }
             }
-            if (reachedEndOfFile)
-            {
-                //Break out of the cycle when we reach the end of the file and we have finished adding the levels to the list.
-                break;
-            }
-            if (currentLine == null)
-            {
-                //Set the flag for end of file to true.
-                reachedEndOfFile = true;
-            }
-
-
+        }
+        catch (ArgumentNullException argumentNullException)
+        {
+            Console.WriteLine("An error occured while trying to read the levels from Levels.txt\n{0}", argumentNullException.Message);
+        }
+        catch (ArgumentException argumentException)
+        {
+            Console.WriteLine("An error occured while trying to read the levels from Levels.txt\n{0}", argumentException.Message);
+        }
+        catch (FileNotFoundException fileNotFoundException)
+        {
+            Console.WriteLine("An error occured while trying to read the levels from Levels.txt\n{0}", fileNotFoundException.Message);
+        }
+        catch (DirectoryNotFoundException directoryNotFoundException)
+        {
+            Console.WriteLine("An error occured while trying to read the levels from Levels.txt\n{0}", directoryNotFoundException.Message);
+        }
+        catch (OutOfMemoryException outOfMemoryException)
+        {
+            Console.WriteLine("An error occured while trying to read the levels from Levels.txt\n{0}", outOfMemoryException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Console.WriteLine("An error occured while trying to read the levels from Levels.txt\n{0}", ioException.Message);
         }
 
         int count = listOfLevels.Count;
-
 
         //String array for all the levels.
         string[,] levels = new string[count, playfieldWidth];
@@ -703,7 +732,15 @@ class PacMan3DGame
         //Select the wanted level from the 2D array.
 
         //Count of the rows of the level.
-        int rowsCount = allLevels.GetLength(1);
+        int rowsCount = 0;
+        try
+        {
+            rowsCount = allLevels.GetLength(1);
+        }
+        catch (IndexOutOfRangeException indexOutOfRangeException)
+        {
+            Console.WriteLine("An error occured while selecting the level from the levels array.\n[{0}]", indexOutOfRangeException.Message);
+        }
 
         //Count of the cols of the level.
         int colsCount = allLevels[0, 0].Length;
@@ -1276,16 +1313,55 @@ class PacMan3DGame
     // put the results in a txt file AFTER the end of the game
     static void ResultsFileTxt() // hardocered needs global variables
     {
-        StreamWriter streamWriter = new StreamWriter(@"..\..\results.txt", append: true);
-        using (streamWriter)  //  ../about.html
+        try
         {
-            int level = levelNumber+1;// hardocered needs global variables
-            int scoreFile = score;// hardocered needs global variables
-            DateTime date = DateTime.Now;
-            //for (int number = 1; number <= 5; number++)
-            //{
+            StreamWriter streamWriter = new StreamWriter(@"..\..\results.txt", append: true);
+            using (streamWriter)  //  ../about.html
+            {
+                int level = levelNumber + 1;// hardocered needs global variables
+                int scoreFile = score;// hardocered needs global variables
+                DateTime date = DateTime.Now;
+                //for (int number = 1; number <= 5; number++)
+                //{
                 streamWriter.WriteLine("{3}'s result : {0,3} |\n Level reached : {1,2} |\n Date played : {2,10}", scoreFile, level, date, heroName);
-            //}
+                //}
+            }
+        }
+        catch (ArgumentNullException argumentNullException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", argumentNullException.Message);
+        }
+        catch (ArgumentException argumentException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", argumentException.Message);
+        }
+        catch (UnauthorizedAccessException unauthorizedAccessException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", unauthorizedAccessException.Message);
+        }
+        catch (DirectoryNotFoundException directoryNotFoundException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", directoryNotFoundException.Message);
+        }
+        catch (ObjectDisposedException objectDisposedException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", objectDisposedException.Message);
+        }
+        catch (PathTooLongException pathTooLongException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", pathTooLongException.Message);
+        }
+        catch (IOException ioException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", ioException.Message);
+        }
+        catch (SecurityException securityException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", securityException.Message);
+        }
+        catch (FormatException formatException)
+        {
+            Console.WriteLine("An error occured while trying to write to file results.txt\n{0}", formatException.Message);
         }
     }
 }
