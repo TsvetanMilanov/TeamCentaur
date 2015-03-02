@@ -1328,7 +1328,7 @@ class PacMan3DGame
                 DateTime date = DateTime.Now;
                 //for (int number = 1; number <= 5; number++)
                 //{
-                streamWriter.WriteLine("{3}'s result : {0,3} |\n Level reached : {1,2} |\n Date played : {2,10}", scoreFile, level, date, heroName);
+                streamWriter.WriteLine("{3}'s result : {0,3} | Level reached : {1,2} | Date played : {2,10}", scoreFile, level, date, heroName);
                 //}
             }
         }
