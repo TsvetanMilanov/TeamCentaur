@@ -34,7 +34,7 @@ class PacMan3DGame
 
     private static Creature pacMan = new Creature(playfieldHeight / 2, playfieldWidth / 2, (char)9787, ConsoleColor.Yellow);
 
-    private static int enemiesCount = 3;
+    private static int enemiesCount = 6;
 
     private static Creature[] enemies = new Creature[enemiesCount];
 
