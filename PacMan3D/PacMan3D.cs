@@ -61,13 +61,13 @@ class PacMan3DGame
 
     static void Main()
     {
-        StartupScreen();
-
         #region Initialization
 
-        // set screen size
-        Console.BufferHeight = Console.WindowHeight = 21;
-        Console.BufferWidth = Console.WindowWidth = 40;
+        // set screen size  
+        Console.WindowHeight = 21;
+        Console.BufferHeight = Console.WindowHeight;
+        Console.WindowWidth = 40;
+        Console.BufferWidth = Console.WindowWidth;
 
         // load levels
         allLevels = ReadLevelsFromFile(playfieldHeight, playfieldWidth);
@@ -117,6 +117,8 @@ class PacMan3DGame
         }
 
         #endregion
+
+        StartupScreen();
 
         #region GameLoop
 
